@@ -12,16 +12,16 @@ void main()
     int strikecounter, ifcounter;
     strikecounter = 0; 
     ifcounter = 0;
-    for(int i = 2; i < n; i++)
+    for(long i = 2; i < n; i++)
     {
         ifcounter += 1;
         if(values[i] != false)
             continue;
         printf("%d \n", i);
         ifcounter += 1;
-        if(i*i >= n) 
+        if(i >= sqrt(n)) 
             continue;
-        for(int j = i*i; j < n; j+=i)
+        for(long j = i*i; j < n; j+=i)
             {
             strikecounter += 1;
             values[j] = true;
