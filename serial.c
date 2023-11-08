@@ -19,7 +19,7 @@ void main()
             continue;
         printf("%d \n", i);
         ifcounter += 1;
-        if(i >= sqrt(n)) 
+        if(i*i >= n) 
             continue;
         for(int j = i*i; j < n; j+=i)
             {
