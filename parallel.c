@@ -32,6 +32,9 @@ void sieve()
 
     while(lowestindex < numvalues)
     {
+        if(s == 0)
+            printtf("%d", currentprime)
+            
         int offset = (startvalue/currentprime) - startvalue;
         if (offset < 0)
             offset += currentprime;
@@ -59,7 +62,6 @@ void sieve()
             {
                 currentprime = Lowest[t];
             }
-
     }
     bsp.sync()
     bsp_pop_reg(Lowest);
