@@ -6,22 +6,22 @@
 void main()
 {
 
-    int n = 100000;
+    long n = 100000;
 
     bool values[100000] = {false}; 
     int strikecounter, ifcounter;
     strikecounter = 0; 
     ifcounter = 0;
-    for(long i = 2; i < n; i++)
+    for(long long int i = 2; i < n; i++)
     {
         ifcounter += 1;
         if(values[i] != false)
             continue;
         printf("%d \n", i);
         ifcounter += 1;
-        if(i >= sqrt(n)) 
+        if(i*i >= n) 
             continue;
-        for(long j = i*i; j < n; j+=i)
+        for(long long int j = i*i; j < n; j+=i)
             {
             strikecounter += 1;
             values[j] = true;
