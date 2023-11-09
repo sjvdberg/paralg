@@ -34,6 +34,9 @@ void sieve()
     bsp_push_reg(Lowest,p*sizeof(long));
     bsp_sync();
 
+    bsp_end();
+    return;
+
     while(lowestindex < numvalues)
     {
         if(s == 0)
