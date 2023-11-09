@@ -67,7 +67,7 @@ void sieve()
             }
 
         bsp_end();
-        return();
+        return;
     }
     bsp_sync();
     bsp_pop_reg(Lowest);
