@@ -33,7 +33,7 @@ void sieve()
     double *Lowest= malloc(n*sizeof(long));
     bsp_push_reg(Lowest,p*sizeof(long));
     bsp_sync();
-    printf("start sieve")
+    printf("start sieve");
 
 
     while(lowestindex < numvalues)
@@ -67,7 +67,7 @@ void sieve()
             }
 
         
-        printf("end sieve")
+        printf("end sieve");
         bsp_end();
         return;
     }
