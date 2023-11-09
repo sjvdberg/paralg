@@ -4,6 +4,7 @@
 
 static long P; // number of processors requested
 static long N; // upper bound on the primes.
+static long Num; // number of elements per processor
 
 void sieve()
 {
@@ -13,10 +14,10 @@ void sieve()
     long n = N;
 
     int numvalues, startvalue;
-    numvalues = (n + p) / p;
+    numvalues = Num
     startvalue = s * numvalues ;
 
-    bool values[numvalues] = {false};
+    bool values[Num] = {false};
     int lowestindex = 0;
     int currentprime = 2;
     if(s == 0)
@@ -25,14 +26,14 @@ void sieve()
         values[1] = true;
         lowestindex = 2;
     }
-    double *Lowest= malloc(MAX(n,1)*sizeof(double complex));
+    double *Lowest= malloc(MAX(n,1)*sizeof(long));
     bsp_push_reg(Lowest,p*sizeof(long));
     bsp_sync();
 
     while(lowestindex < numvalues)
     {
         if(s == 0)
-            printtf("%d", currentprime)
+            printtf("%d", currentprime);
 
         int offset = (startvalue/currentprime) - startvalue;
         if (offset < 0)
@@ -46,8 +47,8 @@ void sieve()
         int lowest = n + 1;
         for(i = lowestindex; i < numvalues; i++)
         {
-            if(values[i] == True) continue;
-            lowest = startvalue + lowestindex
+            if(values[i] == true) continue;
+            lowest = startvalue + lowestindex;
             break;
         }
 
@@ -55,18 +56,18 @@ void sieve()
             bsp_put(t,&lowest,Lowest,s*sizeof(long),sizeof(long));
         bsp.sync();
 
-        currentprime = lowest
+        currentprime = lowest;
         for(long t = 0; t < p; t++)
             if(Lowest[t] < currentprime)
             {
                 currentprime = Lowest[t];
             }
     }
-    bsp.sync()
+    bsp.sync();
     bsp_pop_reg(Lowest);
-    free(Lowest)
+    free(Lowest);
 
-    bsp_end()
+    bsp_end();
 }
 
 int main(int argc, char **argv){
@@ -83,6 +84,7 @@ int main(int argc, char **argv){
     }
     N=1000;
     if (argc>2) N=atol(argv[2]);
+    Num = (N+P)/P;
 
     /* SPMD part */
     bspinprod();
