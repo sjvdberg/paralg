@@ -16,7 +16,7 @@ void sieve()
 
     int numvalues, startvalue;
     numvalues = Num;
-    int startvalue = s * numvalues;
+    startvalue = s * numvalues;
 
     bool values[Num];
     for(int i = 0; i < numvalues; i++)
@@ -36,7 +36,7 @@ void sieve()
     while(lowestindex < numvalues)
     {
         if(s == 0)
-            printtf("%d", currentprime);
+            printf("%d", currentprime);
 
         int offset = (startvalue/currentprime) - startvalue;
         if (offset < 0)
