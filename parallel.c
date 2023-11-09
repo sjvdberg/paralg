@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
-#include "bspedupack.h"
 
 static long P; // number of processors requested
 static long N; // upper bound on the primes.
