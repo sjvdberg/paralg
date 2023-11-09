@@ -71,6 +71,7 @@ void sieve()
                     printf("Lowest %d is %d.\n", t, Lowest[t]);
                 currentprime = Lowest[t];
             }
+        bsp_sync()
 
     }
     bsp_sync();
