@@ -30,7 +30,7 @@ void sieve()
         values[1] = true;
         lowestindex = 2;
     }
-    double *Lowest= malloc(n*sizeof(long));
+    double *Lowest= malloc(p*sizeof(long));
     bsp_push_reg(Lowest,p*sizeof(long));
     bsp_sync();
     printf("start sieve with %d processors on %d.\n", p, s);
