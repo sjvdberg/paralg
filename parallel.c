@@ -26,7 +26,7 @@ void sieve()
         values[1] = true;
         lowestindex = 2;
     }
-    double *Lowest= vecallocd(p);
+    double *Lowest= malloc(MAX(n,1)*sizeof(double complex));
     bsp_push_reg(Lowest,p*sizeof(long));
     bsp_sync();
 
@@ -34,7 +34,7 @@ void sieve()
     {
         if(s == 0)
             printtf("%d", currentprime)
-            
+
         int offset = (startvalue/currentprime) - startvalue;
         if (offset < 0)
             offset += currentprime;
@@ -65,7 +65,7 @@ void sieve()
     }
     bsp.sync()
     bsp_pop_reg(Lowest);
-    vecfreed(Lowest);
+    free(Lowest)
 
     bsp_end()
 }
