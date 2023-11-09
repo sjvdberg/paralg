@@ -21,7 +21,12 @@ void sieve(long n)
     int strikecounter, ifcounter;
     strikecounter = 0; 
     ifcounter = 0;
-    for(long long int i = 2; i < n; i++)
+    for(long long int j = 4; j < n; j+= 2)
+        {
+        strikecounter += 1;
+        values[j] = true;
+        }
+    for(long long int i = 3; i < n; i++)
     {
         ifcounter += 1;
         if(values[i] != false)
