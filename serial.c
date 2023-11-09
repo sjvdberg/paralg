@@ -6,9 +6,9 @@
 void main()
 {
 
-    long n = 100000;
+    long n = 1000000;
 
-    bool values[100000] = {false}; 
+    bool values[1000000] = {false}; 
     int strikecounter, ifcounter;
     strikecounter = 0; 
     ifcounter = 0;
