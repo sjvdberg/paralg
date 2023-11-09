@@ -29,7 +29,7 @@ void sieve(long n)
         ifcounter += 1;
         if(i*i >= n) 
             continue;
-        for(long long int j = i; j < n; j+=i)
+        for(long long int j = i*i; j < n; j+= 2*i)
             {
             strikecounter += 1;
             values[j] = true;
