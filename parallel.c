@@ -33,12 +33,12 @@ void sieve()
     double *Lowest= malloc(n*sizeof(long));
     bsp_push_reg(Lowest,p*sizeof(long));
     bsp_sync();
-    printf("start sieve");
+    printf("start sieve with %d processors.\n", p);
 
 
     while(lowestindex < numvalues)
     {
-        printf("%d", currentprime);
+        printf("sieve prime %d\n", currentprime);
 
         int offset = (startvalue/currentprime) - startvalue;
         if (offset < 0)
@@ -66,10 +66,6 @@ void sieve()
                 currentprime = Lowest[t];
             }
 
-        
-        printf("end sieve");
-        bsp_end();
-        return;
     }
     bsp_sync();
     bsp_pop_reg(Lowest);
