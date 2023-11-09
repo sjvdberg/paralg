@@ -26,7 +26,6 @@ void sieve(long n)
         strikecounter += 1;
         values[j] = true;
         }
-    return;
     for(long long int i = 3; i < n; i++)
     {
         ifcounter += 1;
