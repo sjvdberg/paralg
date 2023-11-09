@@ -38,6 +38,7 @@ void sieve()
 
     while(lowestindex < numvalues)
     {
+        if(currentprime - startvalue < numvalues) lowestindex++;
         if(s == 1)
             printf("sieve prime %d\n", currentprime);
 
@@ -59,7 +60,7 @@ void sieve()
         printf("Lowest is %d.\n", lowest);
 
         for (long t=0; t<p; t++)
-            bsp_put(t,lowest,Lowest,s*sizeof(long),sizeof(long));
+            bsp_put(t,&lowest,Lowest,s*sizeof(long),sizeof(long));
         bsp_sync();
 
         currentprime = lowest;
@@ -70,7 +71,6 @@ void sieve()
                     printf("Lowest %d is %d.\n", t, Lowest[t]);
                 currentprime = Lowest[t];
             }
-        if(currentprime == lowest) lowestindex++;
 
     }
     bsp_sync();
