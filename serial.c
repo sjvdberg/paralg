@@ -8,6 +8,8 @@ void main()
     sieve(10000);
     sieve(100000);
     sieve(1000000);
+    sieve(10000000);
+    sieve(100000000);
 }
 
 void sieve(long n)
@@ -27,7 +29,7 @@ void sieve(long n)
         ifcounter += 1;
         if(i*i >= n) 
             continue;
-        for(long long int j = i; j < n; j+=i)
+        for(long long int j = i*i; j < n; j+=i)
             {
             strikecounter += 1;
             values[j] = true;
