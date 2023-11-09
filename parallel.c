@@ -20,7 +20,7 @@ void sieve()
 
     bool values[Num];
     for(int i = 0; i < numvalues; i++)
-        values[i] = false
+        values[i] = false;
     int lowestindex = 0;
     int currentprime = 2;
     if(s == 0)
@@ -55,7 +55,7 @@ void sieve()
 
         for (long t=0; t<p; t++)
             bsp_put(t,&lowest,Lowest,s*sizeof(long),sizeof(long));
-        bsp.sync();
+        bsp_sync();
 
         currentprime = lowest;
         for(long t = 0; t < p; t++)
