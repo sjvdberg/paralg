@@ -4,10 +4,10 @@
 
 void main()
 {
-    sieve(1000)
-    sieve(10000)
-    sieve(100000)
-    sieve(1000000)
+    sieve(1000);
+    sieve(10000);
+    sieve(100000);
+    sieve(1000000);
 }
 
 void sieve(long n)
