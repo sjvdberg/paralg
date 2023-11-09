@@ -15,10 +15,12 @@ void sieve()
     long n = N;
 
     int numvalues, startvalue;
-    numvalues = Num
-    startvalue = s * numvalues ;
+    numvalues = Num;
+    int startvalue = s * numvalues;
 
-    bool values[Num] = {false};
+    bool values[Num];
+    for(int i = 0; i < numvalues; i++)
+        values[i] = false
     int lowestindex = 0;
     int currentprime = 2;
     if(s == 0)
@@ -39,14 +41,12 @@ void sieve()
         int offset = (startvalue/currentprime) - startvalue;
         if (offset < 0)
             offset += currentprime;
-        if(start < startvalue)
-            start += currentprime;
         for(int i = offset; i < numvalues; i += currentprime)
         {
             values[i] = true;
         }
         int lowest = n + 1;
-        for(i = lowestindex; i < numvalues; i++)
+        for(int i = lowestindex; i < numvalues; i++)
         {
             if(values[i] == true) continue;
             lowest = startvalue + lowestindex;
@@ -64,7 +64,7 @@ void sieve()
                 currentprime = Lowest[t];
             }
     }
-    bsp.sync();
+    bsp_sync();
     bsp_pop_reg(Lowest);
     free(Lowest);
 
