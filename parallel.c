@@ -61,6 +61,7 @@ void sieve()
         for (long t=0; t<p; t++)
         {
             printf("wrote %d to %d.\n", lowest, t);
+            
             bsp_put(t,&lowest,Lowest,s*sizeof(long),sizeof(long));
         }
         bsp_sync();
