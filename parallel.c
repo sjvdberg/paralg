@@ -34,8 +34,6 @@ void sieve()
     bsp_push_reg(Lowest,p*sizeof(long));
     bsp_sync();
 
-    bsp_end();
-    return;
 
     while(lowestindex < numvalues)
     {
@@ -67,6 +65,9 @@ void sieve()
             {
                 currentprime = Lowest[t];
             }
+
+        bsp_end();
+        return();
     }
     bsp_sync();
     bsp_pop_reg(Lowest);
