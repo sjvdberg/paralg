@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include <bsp.h>
 
 static long P; // number of processors requested
 static long N; // upper bound on the primes.
@@ -29,7 +30,7 @@ void sieve()
         values[1] = true;
         lowestindex = 2;
     }
-    double *Lowest= malloc(MAX(n,1)*sizeof(long));
+    double *Lowest= malloc(n*sizeof(long));
     bsp_push_reg(Lowest,p*sizeof(long));
     bsp_sync();
 
