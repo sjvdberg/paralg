@@ -72,11 +72,13 @@ void sieve()
                 printf("Lowest %d is %d.\n", t, Lowest[t]);
         }
         bsp_sync();
+        bsp_pop_reg(Lowest);
+        free(Lowest);
+        bsp_sync();
 
     }
     bsp_sync();
-    bsp_pop_reg(Lowest);
-    free(Lowest);
+
 
     bsp_end();
 }
