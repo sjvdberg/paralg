@@ -89,7 +89,7 @@ int main(int argc, char **argv){
     Num = (N+P)/P;
 
     /* SPMD part */
-    bspinprod();
+    sieve();
 
     /* Sequential part */
     exit(EXIT_SUCCESS);
