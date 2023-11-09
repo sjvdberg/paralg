@@ -10,7 +10,7 @@ bsp: parallel.x
 
 
 bsp_inprod.x: parallel.c bspedupack.c
-	bspcc ${CFLAGS} -o bsp_inprod.x $< bspedupack.c -lm
+	bspcc ${CFLAGS} -o parallel.x $< bspedupack.c -lm
 
 
 clean:
