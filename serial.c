@@ -33,7 +33,7 @@ void sieve(long n)
             values[j] = true;
             }
     }
-    printtf("regular. n = %d.\n", n);
+    printf("regular. n = %d.\n", n);
     printf("strike counter is %d \n", strikecounter);
     printf("if counter is %d \n", ifcounter);
     getchar();
