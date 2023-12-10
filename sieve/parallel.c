@@ -58,7 +58,7 @@ void sieve()
         printf("Lowest index is %d.\n", lowestindex);
         printf("Lowest is %d.\n", lowest);
         
-        for (long t=0; t<p; t++)
+        for (long t=0; t<p; t++), 
         {
             printf("wrote %d to %d.\n", lowest, t);
             
