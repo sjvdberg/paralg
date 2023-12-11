@@ -11,7 +11,7 @@ bsp: bsp_inprod.x
 
 
 bsp_inprod.x: bsp_inprod.c bspedupack.c
-	bspcc ${CFLAGS} -o bsp_inprod.x $< bspedupack.c -lm
+	~/MultiCoreBSP-for-C/tools/bspcc ${CFLAGS} -o bsp_inprod.x $< bspedupack.c -lm
 
 mpi_inprod.x: mpi_inprod.c
 	mpicc ${CFLAGS} -o mpi_inprod.x $< -lm
