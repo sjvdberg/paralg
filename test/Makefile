@@ -6,10 +6,10 @@ CFLAGS=-O3 -march=native
 
 default: bsp
 
-bsp: bsp_inprod.x
+bsp: code.c
 
 
-compiled.x: bsp_inprod.c
+compiled.x: code.c
 	bspcc ${CFLAGS} -o compiled.x 
 
 clean:
