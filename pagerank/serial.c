@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-static long N = 100; // 
+static long N = 10000; // 
 
 void main()
 {
@@ -15,7 +15,7 @@ void CreateGraph()
     for (int i = 0; i < N; i++)
     {
         int k = rand() % 10;
-        for(int l = 0; l < 10; l++)
+        for(int l = 0; l < 11; l++)
         {
             if(l <= k)
             {
@@ -35,10 +35,12 @@ void CreateGraph()
     for(int i = 0; i < N; i++)
         numOutlinks[i] = 0;
     for(int i = 0; i < N; i++)
-        for(int j = 0; j < 10; j++)
+        for(int j = 0; j < 11; j++)
             if(baseRows[i][j] != -1)
             {
                 numOutlinks[baseRows[i][j]]++;
+                if(baseRows[i][j] >= N)
+                    printf("error");
             }
 
     printf("Computed outlinks.\n");
@@ -49,13 +51,13 @@ void CreateGraph()
         if(numOutlinks[i] == 0)
         {
             numElements++;
-            baseRows[i][11] = i; //WRONG EDIT
+            baseRows[i][10] = i;
             numOutlinks[i] = 1;
+            printf("created self link on %i", i);
         }
         else
         {
             numElements += numOutlinks[i];
-            baseRows[i][11] = -1;
         }
     }
 
@@ -71,8 +73,7 @@ void CreateGraph()
         {
             if(baseRows[i][l] != -1)
             {
-                rows[k] = baseRows[i][l];
-                k++;
+                rows[k] = baseRows[i][l];k++;
             }
         }
         if(i + 1 == N) continue;
@@ -99,7 +100,7 @@ void CreateGraph()
     for(int i = 0; i < N; i++)
     {
         u[i] /= tot;
-        printf("initial u at %i is %f\n", i, u[i]);
+        //printf("initial u at %i is %f\n", i, u[i]);
     }
 
     printf("Computed initial u.\n");
@@ -119,10 +120,11 @@ void CreateGraph()
         else
             nextOffset = offsets[i+1];
         for(int j = offsets[i]; j < nextOffset; j++)
-        r[i] = 1 - (u[i] - r[i]*p);
-    }
-    for(int i = 0; i < N; i++)
-    {
+        {
+
+            r[i] += tempr[rows[j]];
+        }
+        r[i] = r[i] * p;
         r[i] = 1 - (u[i] - r[i]);
     }
     printf("Computed initial r.\n");
@@ -150,16 +152,14 @@ void CreateGraph()
                 nextOffset = offsets[i+1];
             for(int j = offsets[i]; j < nextOffset; j++)
             {
-                //printf("rows %i is %i.\n", i, rows[j]);
-                r[i] += p * (float)tempr[rows[j]];
-                //printf("current r in %i is %f. %f . %i.\n", i, r[i], p, rows[j]);
+                r[i] +=(float)tempr[rows[j]];
             }
+            r[i] = r[i] * p;
         }
         t++;
         norm = 0;
         for(int i = 0; i< N; i++)
         {
-            //printf("residual %i is %f\n", i, r[i]);
             norm += r[i]*r[i];
         }
         norm = sqrt(norm);
