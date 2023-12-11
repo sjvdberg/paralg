@@ -11,15 +11,15 @@ void main()
 
 void CreateGraph()
 {
-    int baseRows[N][10];
+    int baseRows[N][11];
     for (int i = 0; i < N; i++)
     {
         int k = rand() % 10;
         for(int l = 0; l < 10; l++)
         {
-            if(l < k)
+            if(l <= k)
             {
-                baseRows[i][l] = rand(0) % N;
+                baseRows[i][l] = rand() % N;
             }
             else
             {
@@ -49,11 +49,14 @@ void CreateGraph()
         if(numOutlinks[i] == 0)
         {
             numElements++;
-            baseRows[i][0] = i;
+            baseRows[i][11] = i; //WRONG EDIT
             numOutlinks[i] = 1;
         }
         else
+        {
             numElements += numOutlinks[i];
+            baseRows[i][11] = -1;
+        }
     }
 
     printf("Added additional outlinks.\n");
@@ -64,7 +67,7 @@ void CreateGraph()
     for (int i = 0; i < N; i++)
     {
         int k = offsets[i];
-        for(int l = 0; l < 10; l++)
+        for(int l = 0; l < 11; l++)
         {
             if(baseRows[i][l] != -1)
             {
