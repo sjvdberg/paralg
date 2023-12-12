@@ -2,15 +2,11 @@
 #include <stdbool.h>
 #include <math.h>
 
-static long N = 10000; // 
+static long N = 100; 
 
 void main()
 {
-    CreateGraph();
-}
-
-void CreateGraph()
-{
+    printf("N = %i\n", N);
     int baseRows[N][11];
     for (int i = 0; i < N; i++)
     {
@@ -53,7 +49,6 @@ void CreateGraph()
             numElements++;
             baseRows[i][10] = i;
             numOutlinks[i] = 1;
-            printf("created self link on %i", i);
         }
         else
         {
@@ -105,6 +100,9 @@ void CreateGraph()
 
     printf("Computed initial u.\n");
     int t = 0;
+    float norms[1000];
+    for(int i = 0; i <1000; i++)
+        norms[i] = -1;
     float p = 0.85;
 
     for(int i = 0; i < N; i++)
@@ -156,13 +154,21 @@ void CreateGraph()
             }
             r[i] = r[i] * p;
         }
-        t++;
         norm = 0;
         for(int i = 0; i< N; i++)
         {
             norm += r[i]*r[i];
         }
         norm = sqrt(norm);
+        norms[t] = norm;
         printf("Computed u and r in step %i, current norm is %f\n", t, norm);
+        t++;
     }
+    float totNormChanges = 0;
+    for(int i = 0; i < t -1; i++)
+    {
+        totNormChanges += (norms[i+1]/norms[i]);
+    }
+    totNormChanges = totNormChanges / t;
+    printf("average norm change is %f\n", totNormChanges);
 }
