@@ -4,13 +4,17 @@
 # for benchmarking/performance evaluation, use:
 CFLAGS=-O3 -march=native
 
-default: bsp
+default: mpi
 
-bsp: test.c
+mpi: test.x
+bsp: test.x
 
+
+test.x: test.c 
+	~/MultiCoreBSP-for-C/tools/bspcc ${CFLAGS} -o bsp_inprod.x $< bspedupack.c -lm
 
 test.x: test.c
-	bspcc ${CFLAGS} -o test.x 
+	mpicc ${CFLAGS} -o test.x $< -lm
 
 clean:
 	-rm *.o *.x
