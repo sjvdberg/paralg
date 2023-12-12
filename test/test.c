@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
 
 
 
-    else if(process_Rank == 1){
+    if(process_Rank == 1){
         MPI_Recv(&message_Item, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         printf("Message Received: %d\n", message_Item);
     }
