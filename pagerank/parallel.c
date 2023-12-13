@@ -185,6 +185,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
         }
     }
+    for(int i = 0; i < N; i++)
+        printf("%i . tempr %i is %f\n", s, i, tempr[i]);
     printf("%i Computed tempr\n", s);
     for(int i = 0; i < numrows; i++)
     {
@@ -226,7 +228,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         for(int i = 0; i < numrows; i++)
         {
             u[i] += res[i];
-            printf("u = %f", u[i]);
+            //printf("u = %f\n", u[i]);
         }
         
         //Computed u.
@@ -279,12 +281,10 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 norm += temp;
             }
         norm = sqrt(norm);
-        printf("%i. Norm in step %i is %f\n", s, t, norm);
+        //printf("%i. Norm in step %i is %f\n", s, t, norm);
         t++;
         if(t > 50)
         {
-            for(int i = 0; i < numrows; i++)
-                printf("%i . r %f . u %f\n", firstrow + i, res[i], u[i]);
             break;
         }
     }
