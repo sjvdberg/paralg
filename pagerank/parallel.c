@@ -128,6 +128,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     float u[numrows], res[numrows], tempr[numrows];
     int tot = 0;
 
+    printf("%i Computed own rows\n", s);
     for(int i = 0; i < numrows; i++)
     {
         int k = rand() % N*1000;
@@ -152,8 +153,10 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             tot += tots[r];
         }
     }
+    printf("%i Computed own u", s);
     for(int i = 0; i < numrows; i++)
     {
+        u[i] = u[i] / tot;
         res[i] = 0;
         tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
     }
@@ -173,6 +176,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             }
         }
     }
+    printf("%i Computed tempr", s);
     for(int i = 0; i < numrows; i++)
     {
         int nextOffset;
@@ -204,7 +208,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             norm += temp;
         }
     norm = sqrt(norm);
-    printf("%i. Norm is %f", s, norm);
+    printf("%i. Norm is %f\n", s, norm);
 
 
 }
