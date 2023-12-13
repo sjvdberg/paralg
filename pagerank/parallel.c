@@ -185,7 +185,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             nextOffset = offsets[i+1];
         for(int j = offsets[i]; j < nextOffset; j++)
         {
-
+            if(j >= numElements)
+                printf("error. j = %i", j);
             res[i] += tempr[rows[j]];
         }
         res[i] = res[i] * p;
