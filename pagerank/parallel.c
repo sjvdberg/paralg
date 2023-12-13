@@ -173,7 +173,11 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     for(int r = 0; r < p; r++)
         if(r != s) 
+        {
+            for(int i = 0; i < numrows; i++)
+                printf("%i. Outgoing tempr value %f", s, u[i]);
             MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+        }
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
     {
