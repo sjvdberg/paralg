@@ -107,8 +107,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             baseRows[i][10] = i;
             numElements++;
         }
-        //else
-            //numElements += Diagonal[i + firstrow];
     }
     int rows[numElements];
     int offsets[numrows];
@@ -165,8 +163,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     printf("%i Computed own u\n", s);
     for(int i = 0; i < numrows; i++)
     {
-        if(tot == 0)
-            printf("tot is 0");
         u[i] = u[i] / tot;
         res[i] = 0;
         tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
@@ -182,9 +178,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             int tempu[numRows(N, p, r)];
             MPI_Irecv(tempu, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
             for(int i = 0; i < numRows(N, p, r); i++)
-            {
-                tempr[i + firstRow(N, p, r)] = tempu[i];
-            }
+                tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
         }
     }
     printf("%i Computed tempr\n", s);
@@ -196,17 +190,11 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         else
             nextOffset = offsets[i+1];
         for(int j = offsets[i]; j < nextOffset; j++)
-        {
-            if(j >= numElements)
-                printf("error. j = %i", j);
-            if(rows[j] >= N)
-                printf("error. rows[j] = %i\n", rows[j]);
             res[i] += tempr[rows[j]];
-        }
         res[i] = res[i] * p;
         res[i] = 1 - (u[i] - res[i]);
     }
-    printf("Computed residual");
+    printf("%i. Computed residual\n", s);
     float norm = 0;
     for(int i = 0; i < numrows; i++)
         norm += res[i]*res[i];
@@ -224,7 +212,59 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         }
     norm = sqrt(norm);
     printf("%i. Norm is %f\n", s, norm);
-    
 
-
+    int t = 0;
+    while(norm > 0.000001)
+    {
+        for(int i = 0; i < numrows; i++)
+        {
+            u[i] += res[i];
+            tempr[i + firstrow] = res[i]*Diagonal[i + firstrow];
+            res[i] = 0;
+        }
+        //Computed u.
+        for(int r = 0; r < p; r++)
+            if(r != s) 
+                MPI_Isend(r, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+        for(int r = 0; r < p; r++)
+        {
+            if(r != s) 
+            {
+                int temp[numRows(N, p, r)];
+                MPI_Irecv(temp, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
+                for(int i = 0; i < numRows(N, p, r); i++)
+                    tempr[i + firstRow(N, p, r)] = temp[i] * Diagonal[i + firstRow(N, p, r)];;
+            }
+        }
+        //Computed tempr.
+        for(int i = 0; i < numrows; i++)
+        {
+            int nextOffset;
+            if(i == numrows-1)
+                nextOffset = numElements;
+            else
+                nextOffset = offsets[i+1];
+            for(int j = offsets[i]; j < nextOffset; j++)
+                res[i] += tempr[rows[j]];
+            res[i] = res[i] * p;
+            res[i] = 1 - (u[i] - res[i]);
+        }
+        //Computed r.
+        for(int i = 0; i < numrows; i++)
+            norm += res[i]*res[i];
+        for(int r = 0; r < p; r++)
+            if(r != s)
+                MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
+        MPI_Barrier(comm);
+        for(int r = 0; r < p; r++)
+            if(r != s)
+            {
+                float temp;
+                MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
+                norm += temp;
+            }
+        norm = sqrt(norm);
+        printf("%i. Norm in step %i is %f", s, t, norm);
+        t++;
+    }
 }
