@@ -135,7 +135,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         u[i] = k;
         tot += k;
     }
-    int tots[p];
     for(int r = 0; r < p; r++)
     {
         if(r == s)
@@ -149,11 +148,12 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     {
         if(r != s)
         {
-            MPI_Irecv(&tots[r], 1, MPI_INT, r, s, comm, &requests[p+r]);
-            tot += tots[r];
+            int temptot;
+            MPI_Irecv(&temptot, 1, MPI_INT, r, s, comm, &requests[p+r]);
+            tot += temptot;
         }
     }
-    printf("%i Computed own u", s);
+    printf("%i Computed own u\n", s);
     for(int i = 0; i < numrows; i++)
     {
         u[i] = u[i] / tot;
@@ -176,7 +176,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             }
         }
     }
-    printf("%i Computed tempr", s);
+    printf("%i Computed tempr\n", s);
     for(int i = 0; i < numrows; i++)
     {
         int nextOffset;
