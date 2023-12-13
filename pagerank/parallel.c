@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 
     if(n<0) MPI_Abort(MPI_COMM_WORLD,-1);
 
-
+    computeVector(n, p, s, MPI_COMM_WORLD)
 
     MPI_Finalize();
     return 0;
@@ -52,7 +52,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 baseRows[i][l] = -1;
         }
     }
-
+    printf("proces %i has computed their rows", s);
     int localDiagonal[N];
     for(int i = 0; i < N; i++)
         localDiagonal[i] = 0;
