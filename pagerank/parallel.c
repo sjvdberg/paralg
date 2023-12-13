@@ -198,7 +198,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         for(int j = offsets[i]; j < nextOffset; j++)
             res[i] += tempr[rows[j]];
         res[i] = res[i] * prob;
-        printf("res %i is %f\n", i, res[i]);
         res[i] = 1 - (u[i] - res[i]);
     }
     printf("%i. Computed residual\n", s);
@@ -226,7 +225,10 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     while(norm > 0.000001)
     {
         for(int i = 0; i < numrows; i++)
+        {
             u[i] += res[i];
+            printf("%i new u[0] is %f\n", s, u[0]);
+        }
         
         //Computed u.
         float newres[numrows];
