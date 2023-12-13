@@ -267,6 +267,10 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         printf("%i. Norm in step %i is %f\n", s, t, norm);
         t++;
         if(t > 50)
+        {
+            for(int i = 0; i < numrows; i++)
+                printf("%i . r %f . u %f", firstrow + i, r[i], u[i]);
             break;
+        }
     }
 }
