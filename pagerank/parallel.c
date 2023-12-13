@@ -192,6 +192,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         res[i] = res[i] * p;
         res[i] = 1 - (u[i] - res[i]);
     }
+    printf("Computed residual");
     float norm = 0;
     for(int i = 0; i < numrows; i++)
         norm += res[i]*res[i];
