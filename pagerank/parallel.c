@@ -61,7 +61,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             if(baseRows[i][l] != -1)
                 localDiagonal[baseRows[i][l]]++;
     int Diagonals[N][p];
-    MPI_Request requests[2*np];
+    MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
     {
         if(r == s)
