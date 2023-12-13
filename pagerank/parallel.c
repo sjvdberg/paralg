@@ -81,6 +81,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             Diagonal[i] += localDiagonal[i];
     }
     printf("succesfully computed diagonal.\n");
-    for(int i = 0; i < n; i++)
+    for(int i = 0; i < N; i++)
         printf("processor %i. %i\n", s, Diagonal[i]);
 }
