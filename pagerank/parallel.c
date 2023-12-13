@@ -187,7 +187,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     printf("%i Computed tempr\n", s);
     for(int i = 0; i < N; i++)
-        printf("%i . tempr at %i is %f", s, i, tempr[i]);
+        printf("%i . tempr at %i is %f\n", s, i, tempr[i]);
     for(int i = 0; i < numrows; i++)
     {
         int nextOffset;
