@@ -124,7 +124,11 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             offsets[i+1] = k;
     }
     for(int i = 0; i < N; i++)
+    {
+        if(Diagonal[i] == 0)
+            Diagonal[i] = 1;
         Diagonal[i] = 1 / Diagonal[i];
+    }
 
     float u[numrows], res[numrows], tempr[N];
     int tot = 0;
