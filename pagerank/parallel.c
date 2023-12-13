@@ -67,12 +67,16 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     printf("proces %i has computed their rows\n", s);
     int localDiagonal[N];
+    int numElements = 0;
     for(int i = 0; i < N; i++)
         localDiagonal[i] = 0;
     for(int i = 0; i < numrows; i++)
         for(int l = 0; l < 10; l++)
             if(baseRows[i][l] != -1)
+            {
+                numElements++;
                 localDiagonal[baseRows[i][l]]++;
+            }
     int Diagonal[N];
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
@@ -94,7 +98,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             Diagonal[i] += localDiagonal[i];
     }
     printf("succesfully computed diagonal.\n");
-    int numElements = 0;
+    
     for(int i = 0; i < numrows; i++)
     {
         if(Diagonal[i + firstrow] == 0)
@@ -103,8 +107,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             baseRows[i][10] = i;
             numElements++;
         }
-        else
-            numElements += Diagonal[i + firstrow];
+        //else
+            //numElements += Diagonal[i + firstrow];
     }
     int rows[numElements];
     int offsets[numrows];
