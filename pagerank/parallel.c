@@ -236,6 +236,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                     tempr[i + firstRow(N, p, r)] = temp[i] * Diagonal[i + firstRow(N, p, r)];;
             }
         }
+        printf("computed tempr\n");
         //Computed tempr.
         for(int i = 0; i < numrows; i++)
         {
