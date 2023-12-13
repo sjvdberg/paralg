@@ -220,7 +220,10 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     while(norm > 0.000001)
     {
         for(int i = 0; i < numrows; i++)
+        {
             u[i] += res[i];
+            printf("u = %f", u[i]);
+        }
         
         //Computed u.
         float newres[numrows];

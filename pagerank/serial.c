@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-static long N = 100; 
+static long N = 10; 
 
 void main()
 {
@@ -129,6 +129,8 @@ void main()
     for(int i = 0; i < N; i++)
         norm += r[i]*r[i];
     norm = sqrt(norm);
+    for(int i = 0; i < N; i++)
+        printf("u %f . r %f\n", u[i], r[i]);
     while(norm > 0.000001)
     {
         for(int i = 0; i < N; i++)
