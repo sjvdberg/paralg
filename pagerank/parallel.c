@@ -183,7 +183,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     {
         if(r != s) 
         {
-            int tempu[numRows(N, p, r)];
+            float tempu[numRows(N, p, r)];
             MPI_Irecv(tempu, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
             for(int i = 0; i < numRows(N, p, r); i++)
             {
