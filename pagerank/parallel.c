@@ -248,7 +248,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             for(int j = offsets[i]; j < nextOffset; j++)
                 res[i] += tempr[rows[j]];
             res[i] = res[i] * p;
-            res[i] = 1 - (u[i] - res[i]);
         }
         //Computed r.
         for(int i = 0; i < numrows; i++)
@@ -265,7 +264,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 norm += temp;
             }
         norm = sqrt(norm);
-        printf("%i. Norm in step %i is %f", s, t, norm);
+        printf("%i. Norm in step %i is %f\n", s, t, norm);
         t++;
         if(t > 50)
             break;
