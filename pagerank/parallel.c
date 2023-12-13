@@ -49,7 +49,7 @@ int firstRow(int N, int p, int s)
 //s is own rank.
 void computeVector(int N, int p, int s, MPI_Comm comm)
 {
-    srand(time(0));
+    srand(time(0) + s);
     int numrows = (N+p-s-1)/p ;
     int firstrow = firstRow(N, p, s);
     
