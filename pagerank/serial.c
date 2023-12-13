@@ -136,7 +136,6 @@ void main()
         for(int i = 0; i < N; i++)
         {
             tempr[i] = r[i]*diagonal[i];
-            //printf("temp r for %i is %f. %f . %f\n", i, tempr[i], r[i], diagonal[i]);
             r[i] = 0;
         }
         for(int i = 0; i < N; i++)

@@ -220,16 +220,18 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     while(norm > 0.000001)
     {
         for(int i = 0; i < numrows; i++)
-        {
             u[i] += res[i];
-            tempr[i + firstrow] = res[i]*Diagonal[i + firstrow];
-            res[i] = 0;
-        }
+        
         //Computed u.
         for(int r = 0; r < p; r++)
             if(r != s) 
                 MPI_Isend(res, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
         MPI_Barrier(comm);
+        for(int i = 0; i  < numrows; i++)
+        {
+            tempr[i + firstrow] = res[i]*Diagonal[i + firstrow];
+            res[i] = 0;
+        }
         for(int r = 0; r < p; r++)
         {
             if(r != s) 
