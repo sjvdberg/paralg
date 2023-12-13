@@ -137,9 +137,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     for(int r = 0; r < p; r++)
     {
-        if(r == s)
-            tots[r] = tot;
-        else
+        if(r != s)
             MPI_Isend(&tot, 1, MPI_INT, r, r, comm, &requests[r]);
     }
     MPI_Barrier(comm);
