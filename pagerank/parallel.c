@@ -126,7 +126,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < N; i++)
         Diagonal[i] = 1 / Diagonal[i];
 
-    float u[numrows], res[numrows], tempr[numrows];
+    float u[numrows], res[numrows], tempr[N];
     int tot = 0;
 
     printf("%i Computed own rows\n", s);
