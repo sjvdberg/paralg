@@ -68,7 +68,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     {
         if(r == s)
         {
-            for(int i = 0; i < numrows; i++)
+            for(int i = 0; i < N; i++)
                 Diagonal[i] = localDiagonal[i];
             continue;
         }
