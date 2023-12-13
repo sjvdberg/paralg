@@ -160,11 +160,14 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             tot += temptot;
         }
     }
+    for(int i = 0; i < numrows; i++)
+    {
+        u[i] = u[i] / (float)tot;
+    }
     printf("%i Computed own u\n", s);
     float prob = 0.85;
     for(int i = 0; i < numrows; i++)
     {
-        u[i] = u[i] / tot;
         res[i] = 0;
         tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
     }
@@ -193,6 +196,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         for(int j = offsets[i]; j < nextOffset; j++)
             res[i] += tempr[rows[j]];
         res[i] = res[i] * prob;
+        printf("res %i is %f\n", i, res[i]);
         res[i] = 1 - (u[i] - res[i]);
     }
     printf("%i. Computed residual\n", s);
