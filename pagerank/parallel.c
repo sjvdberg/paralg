@@ -60,14 +60,14 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         for(int l = 0; l < 10; l++)
             if(baseRows[i][l] != -1)
                 localDiagonal[baseRows[i][l]]++;
-    int Diagonals[N][p];
+    int Diagonal[N];
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
     {
         if(r == s)
         {
             for(int i = 0; i < numrows; i++)
-                Diagonals[r][i] = localDiagonal[i];
+                Diagonal[i] = localDiagonal[i];
             continue;
         }
         MPI_Isend(localDiagonal, N, MPI_INT, r, r, comm, &requests[r]);
@@ -78,7 +78,9 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         if(r == s) continue;
         MPI_Irecv(localDiagonal, N, MPI_INT, r, s, comm, &requests[p+r]);
         for(int i = 0; i < numrows; i++)
-            Diagonals[r][i] = localDiagonal[i];
+            Diagonal[i] += localDiagonal[i];
     }
     printf("succesfully computed diagonal.\n");
+    for(int i = 0; i < n; i++)
+        printf("processor %i. %i\n", s, Diagonal[i]);
 }
