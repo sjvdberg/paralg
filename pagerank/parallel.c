@@ -173,11 +173,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     for(int r = 0; r < p; r++)
         if(r != s) 
-        {
-            for(int i = 0; i < numrows; i++)
-                printf("%i. Outgoing tempr value %f\n", s, u[i]);
             MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
-        }
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
     {
@@ -186,10 +182,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             float tempu[numRows(N, p, r)];
             MPI_Irecv(tempu, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
             for(int i = 0; i < numRows(N, p, r); i++)
-            {
-                printf("%i. Incoming tempr value %f\n", s, tempu[i]);
                 tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
-            }
         }
     }
     printf("%i Computed tempr\n", s);
@@ -288,7 +281,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 norm += temp;
             }
         norm = sqrt(norm);
-        //printf("%i. Norm in step %i is %f\n", s, t, norm);
+        printf("%i. Norm in step %i is %f\n", s, t, norm);
         t++;
         if(t > 50)
         {
