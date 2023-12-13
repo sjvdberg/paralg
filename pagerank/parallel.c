@@ -214,6 +214,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     printf("%i. Norm is %f\n", s, norm);
 
     int t = 0;
+    for(int i = 0; i < numrows; i++)
+        printf("%i . r %f . u %f\n", firstrow + i, res[i], u[i]);
     while(norm > 0.000001)
     {
         for(int i = 0; i < numrows; i++)
@@ -269,7 +271,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         if(t > 50)
         {
             for(int i = 0; i < numrows; i++)
-                printf("%i . r %f . u %f", firstrow + i, res[i], u[i]);
+                printf("%i . r %f . u %f\n", firstrow + i, res[i], u[i]);
             break;
         }
     }
