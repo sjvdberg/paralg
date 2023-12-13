@@ -132,7 +132,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     printf("%i Computed own rows\n", s);
     for(int i = 0; i < numrows; i++)
     {
-        int k = rand() % N*1000;
+        int k = rand() % (N*1000);
         u[i] = k;
         tot += k;
     }
@@ -155,6 +155,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     printf("%i Computed own u\n", s);
     for(int i = 0; i < numrows; i++)
     {
+        if(tot == 0)
+            printf("tot is 0");
         u[i] = u[i] / tot;
         res[i] = 0;
         tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
