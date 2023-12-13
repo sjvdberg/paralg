@@ -24,13 +24,24 @@ int main(int argc, char **argv)
     return 0;
 } /* end main */
 
-//n is number of rows/columns.
-//p is number of processors.
-//s is own rank.
-void computeVector(int N, int p, int s, MPI_Comm comm)
+//Gives the local index of a value.
+int nloc(int i, int p, int N)
 {
-    srand(time(0));
-    int numrows = (N+p-s-1)/p ;
+    int remainder = N % p;
+    if(i < remainder * (N/p) + remainder)
+    {
+        
+    } 
+    return 
+}
+
+int numRows(int N, int p, int s)
+{
+    return (N+p-s-1)/p;
+}
+int firstRow(int N, int p, int s)
+{
+    int numrows = numRows(N, p,s);
     int remainder = N % p;
     int firstrow;
     if( s < remainder) 
@@ -39,6 +50,17 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     else
         //The first remainder processors have 1 more element
         firstrow = s * numrows + remainder;
+    return firstrow;
+}
+
+//n is number of rows/columns.
+//p is number of processors.
+//s is own rank.
+void computeVector(int N, int p, int s, MPI_Comm comm)
+{
+    srand(time(0));
+    int numrows = (N+p-s-1)/p ;
+    int firstrow = firstRow(N, p, s);
     
     int baseRows[numrows][11];
     for(int i = 0; i < numrows; i++)
@@ -61,8 +83,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             if(baseRows[i][l] != -1)
                 localDiagonal[baseRows[i][l]]++;
     int Diagonal[N];
-    for(int i = 0; i < N; i++)
-        printf("processor %i. %i\n", s, localDiagonal[i]);
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
     {
@@ -83,6 +103,117 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             Diagonal[i] += localDiagonal[i];
     }
     printf("succesfully computed diagonal.\n");
+    int numElements = 0;
+    for(int i = 0; i < numrows; i++)
+    {
+        if(Diagonal[i + firstrow] == 0)
+        {
+            Diagonal[i + firstrow] = 1;
+            baseRows[i][10] = i;
+            numElements++;
+        }
+        else
+            numElements += Diagonal[i + firstrow];
+    }
+    int rows[numElements];
+    int offsets[numrows];
+    offsets[0] = 0;
+    for(int i = 0; i < numrows; i++)
+    {
+        int k = offsets[i];
+        for(int l = 0; l < 11; l++)
+        {
+            if(baseRows[i][l] != 0)
+            {
+                rows[k] = baseRows[i][l];
+                k++;
+            }
+        }
+        if(i != numrows-1)
+            offsets[i+1] = k;
+    }
     for(int i = 0; i < N; i++)
-        printf("processor %i. %i . %i\n", s, localDiagonal[i], Diagonal[i]);
+        Diagonal[i] = 1 / Diagonal[i];
+
+    float u[numrows], res[numrows], tempr[numroNws];
+    int tot = 0;
+
+    for(int i = 0; i < numrows; i++)
+    {
+        int k = rand() % N*1000;
+        u[i] = k;
+        tot += k;
+    }
+    int tots[p];
+    for(int r = 0; r < p; r++)
+    {
+        if(r == s)
+            tots[r] = tot;
+        else
+            MPI_Isend(tot, 1, MPI_INT, r, r, comm, &requests[r]);
+    }
+    MPI_Barrier(comm);
+
+    for(int r = 0; r < p; r++)
+    {
+        if(r != s)
+        {
+            MPI_Irecv(tots[r], 1, MPI_INT, r, s, comm, &requests[p+r]);
+            tot += tots[r];
+        }
+    }
+    for(int i = 0; i < numrows; i++)
+    {
+        res[i] = 0;
+        tempr[i + firstrow] = u[i] * diagonal[i + firstrow];
+    }
+    for(int r = 0; r < p; r++)
+        if(r != s) 
+            MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+    MPI_Barrier(comm);
+    for(int r = 0; r < p; r++)
+    {
+        if(r != s) 
+        {
+            int tempu[numRows(N, p, r)];
+            MPI_Irecv(tempu, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
+            for(int i = 0; i < numRows(N, p, r); i++)
+            {
+                tempr[i + firstRow(N, p, r)] = tempu[i];
+            }
+        }
+    }
+    for(int i = 0; i < numrows; i++)
+    {
+        int nextOffset;
+        if(i == numrows-1)
+            nextOffset = numElements;
+        else
+            nextOffset = offsets[i+1];
+        for(int j = offsets[i]; j < nextOffset; j++)
+        {
+
+            res[i] += tempr[rows[j]];
+        }
+        res[i] = res[i] * p;
+        res[i] = 1 - (u[i] - res[i]);
+    }
+    float norm = 0;
+    for(int i = 0; i < numrows; i++)
+        norm += r[i]*r[i];
+    for(int r = 0; r < p; r++)
+        if(r != s)
+            MPI_Isend(norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
+    MPI_Barrier(comm);
+    for(int r = 0; r < p; r++)
+        if(r != s)
+        {
+            float temp;
+            MPI_Irecv(temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
+            norm += temp;
+        }
+    norm = sqrt(norm);
+    printf("%i. Norm is %f", s, norm);
+
+
 }
