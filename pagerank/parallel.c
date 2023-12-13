@@ -135,7 +135,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < N; i++)
         Diagonal[i] = 1 / Diagonal[i];
 
-    float u[numrows], res[numrows], tempr[numroNws];
+    float u[numrows], res[numrows], tempr[numrows];
     int tot = 0;
 
     for(int i = 0; i < numrows; i++)
@@ -200,7 +200,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     float norm = 0;
     for(int i = 0; i < numrows; i++)
-        norm += r[i]*r[i];
+        norm += res[i]*res[i];
+        
     for(int r = 0; r < p; r++)
         if(r != s)
             MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
