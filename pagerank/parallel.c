@@ -132,7 +132,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         if(Diagonal[i] == 0)
             Diagonal[i] = 1;
         Diagonal[i] = 1 / Diagonal[i];
-        printf("%i Diagonal value at %i is %f\n", s, i, Diagonal[i]);
     }
 
     float u[numrows], res[numrows], tempr[N];
@@ -187,6 +186,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         }
     }
     printf("%i Computed tempr\n", s);
+    for(int i = 0; i < N; i++)
+        printf("%i . tempr at %i is %f", s, i, tempr[i]);
     for(int i = 0; i < numrows; i++)
     {
         int nextOffset;
