@@ -193,7 +193,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         {
             if(j >= numElements)
                 printf("error. j = %i", j);
-            if(rows[j >= N])
+            if(rows[j] >= N)
                 printf("error. rows[j] = %i\n", rows[j]);
             res[i] += tempr[rows[j]];
         }
