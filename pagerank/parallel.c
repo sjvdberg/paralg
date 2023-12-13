@@ -223,6 +223,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             res[i] = 0;
         }
         //Computed u.
+        printf("%i computed u\n", s);
         for(int r = 0; r < p; r++)
             if(r != s) 
                 MPI_Isend(r, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
@@ -236,7 +237,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                     tempr[i + firstRow(N, p, r)] = temp[i] * Diagonal[i + firstRow(N, p, r)];;
             }
         }
-        printf("computed tempr\n");
+        printf("%i computed tempr\n", s);
         //Computed tempr.
         for(int i = 0; i < numrows; i++)
         {
