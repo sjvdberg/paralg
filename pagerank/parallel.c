@@ -77,7 +77,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 numElements++;
                 localDiagonal[baseRows[i][l]]++;
             }
-    int Diagonal[N];
+    float Diagonal[N];
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
     {
@@ -185,8 +185,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
         }
     }
-    for(int i = 0; i < N; i++)
-        printf("%i . tempr %i is %f\n", s, i, Diagonal[i]);
     printf("%i Computed tempr\n", s);
     for(int i = 0; i < numrows; i++)
     {
