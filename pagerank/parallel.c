@@ -269,7 +269,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         if(t > 50)
         {
             for(int i = 0; i < numrows; i++)
-                printf("%i . r %f . u %f", firstrow + i, r[i], u[i]);
+                printf("%i . r %f . u %f", firstrow + i, res[i], u[i]);
             break;
         }
     }
