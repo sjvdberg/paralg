@@ -186,7 +186,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         }
     }
     for(int i = 0; i < N; i++)
-        printf("%i . tempr %i is %f\n", s, i, tempr[i]);
+        printf("%i . tempr %i is %f\n", s, i, Diagonal[i]);
     printf("%i Computed tempr\n", s);
     for(int i = 0; i < numrows; i++)
     {
