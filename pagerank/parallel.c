@@ -24,16 +24,6 @@ int main(int argc, char **argv)
     return 0;
 } /* end main */
 
-//Gives the local index of a value.
-int nloc(int i, int p, int N)
-{
-    int remainder = N % p;
-    if(i < remainder * (N/p) + remainder)
-    {
-        
-    } 
-    return 
-}
 
 int numRows(int N, int p, int s)
 {
@@ -201,7 +191,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     float norm = 0;
     for(int i = 0; i < numrows; i++)
         norm += res[i]*res[i];
-        
+
     for(int r = 0; r < p; r++)
         if(r != s)
             MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
