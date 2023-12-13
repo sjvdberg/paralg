@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 
     if(n<0) MPI_Abort(MPI_COMM_WORLD,-1);
 
-    computeVector(n, p, s, MPI_COMM_WORLD)
+    computeVector(n, p, s, MPI_COMM_WORLD);
 
     MPI_Finalize();
     return 0;
