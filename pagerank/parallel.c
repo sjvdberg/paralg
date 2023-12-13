@@ -223,7 +223,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             res[i] = 0;
         }
         //Computed u.
-        printf("%i computed u\n", s);
         for(int r = 0; r < p; r++)
             if(r != s) 
                 MPI_Isend(res, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
@@ -252,6 +251,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             res[i] = 1 - (u[i] - res[i]);
         }
         //Computed r.
+        printf( "%i computed r", s);
         for(int i = 0; i < numrows; i++)
             norm += res[i]*res[i];
         for(int r = 0; r < p; r++)
