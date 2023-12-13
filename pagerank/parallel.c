@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <math.h>
 #include <mpi.h>
+#include <stdlib.h>
 
 int main(int argc, char **argv)
 {
@@ -194,6 +195,9 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < numrows; i++)
         norm += res[i]*res[i];
 
+
+    norm = sqrt(norm);
+    printf("%i. Norm is %f\n", s, norm);
     for(int r = 0; r < p; r++)
         if(r != s)
             MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
@@ -205,8 +209,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
             norm += temp;
         }
-    norm = sqrt(norm);
-    printf("%i. Norm is %f\n", s, norm);
 
 
 }
