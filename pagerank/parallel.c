@@ -61,6 +61,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             if(baseRows[i][l] != -1)
                 localDiagonal[baseRows[i][l]]++;
     int Diagonal[N];
+    for(int i = 0; i < N; i++)
+        printf("processor %i. %i\n", s, localDiagonal[i]);
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
     {
