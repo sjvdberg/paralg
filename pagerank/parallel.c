@@ -150,7 +150,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         if(r == s)
             tots[r] = tot;
         else
-            MPI_Isend(tot, 1, MPI_INT, r, r, comm, &requests[r]);
+            MPI_Isend(&tot, 1, MPI_INT, r, r, comm, &requests[r]);
     }
     MPI_Barrier(comm);
 
@@ -158,14 +158,14 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     {
         if(r != s)
         {
-            MPI_Irecv(tots[r], 1, MPI_INT, r, s, comm, &requests[p+r]);
+            MPI_Irecv(&tots[r], 1, MPI_INT, r, s, comm, &requests[p+r]);
             tot += tots[r];
         }
     }
     for(int i = 0; i < numrows; i++)
     {
         res[i] = 0;
-        tempr[i + firstrow] = u[i] * diagonal[i + firstrow];
+        tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
     }
     for(int r = 0; r < p; r++)
         if(r != s) 
@@ -203,13 +203,13 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         norm += r[i]*r[i];
     for(int r = 0; r < p; r++)
         if(r != s)
-            MPI_Isend(norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
+            MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
         if(r != s)
         {
             float temp;
-            MPI_Irecv(temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
+            MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
             norm += temp;
         }
     norm = sqrt(norm);

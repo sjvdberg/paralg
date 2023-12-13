@@ -68,11 +68,12 @@ void main()
         {
             if(baseRows[i][l] != -1)
             {
-                rows[k] = baseRows[i][l];k++;
+                rows[k] = baseRows[i][l];
+                k++;
             }
         }
-        if(i + 1 == N) continue;
-        offsets[i+1] = k;
+        if(i != N - 1) 
+            offsets[i+1] = k;
     }
     printf("Computed stochastic row Matrix.\n");
 
@@ -93,10 +94,7 @@ void main()
         tot += k;
     }
     for(int i = 0; i < N; i++)
-    {
         u[i] /= tot;
-        //printf("initial u at %i is %f\n", i, u[i]);
-    }
 
     printf("Computed initial u.\n");
     int t = 0;
