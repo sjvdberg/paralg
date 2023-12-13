@@ -239,10 +239,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         }
         for(int r = 0; r < p; r++)
             if(r != s) 
-            {
-                printf("%i sent %f\n ", s, res[0]);
                 MPI_Isend(res, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
-            }
         MPI_Barrier(comm);
         
         for(int r = 0; r < p; r++)
@@ -251,7 +248,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             {
                 float temp[numRows(N, p, r)];
                 MPI_Irecv(temp, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
-                printf("%i received %f\n", s, temp[0]);
+
                 for(int i = 0; i < numRows(N, p, r); i++)
                     tempr[i + firstRow(N, p, r)] = temp[i] * Diagonal[i + firstRow(N, p, r)];;
             }
