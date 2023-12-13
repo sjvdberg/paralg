@@ -163,7 +163,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < numrows; i++)
     {
         u[i] = u[i] / (float)tot;
-        printf("%i u[%i] is %f", s, i, u[i];)
+        printf("%i u[%i] is %f", s, i, u[i]);
     }
     printf("%i Computed own u\n", s);
     float prob = 0.85;
