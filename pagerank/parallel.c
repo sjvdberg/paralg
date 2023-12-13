@@ -226,7 +226,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         printf("%i computed u\n", s);
         for(int r = 0; r < p; r++)
             if(r != s) 
-                MPI_Isend(r, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+                MPI_Isend(res, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
         for(int r = 0; r < p; r++)
         {
             if(r != s) 
