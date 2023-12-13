@@ -117,6 +117,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             if(baseRows[i][l] != -1)
             {
                 rows[k] = baseRows[i][l];
+                if(rows[k] > N)
+                    printf(" error. rows[k] = %i", rows[k]);
                 k++;
             }
         }
