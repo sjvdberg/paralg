@@ -114,7 +114,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         int k = offsets[i];
         for(int l = 0; l < 11; l++)
         {
-            if(baseRows[i][l] != 0)
+            if(baseRows[i][l] != -1)
             {
                 rows[k] = baseRows[i][l];
                 k++;
