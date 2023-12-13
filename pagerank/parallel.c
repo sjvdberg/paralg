@@ -52,7 +52,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 baseRows[i][l] = -1;
         }
     }
-    printf("proces %i has computed their rows", s);
+    printf("proces %i has computed their rows\n", s);
     int localDiagonal[N];
     for(int i = 0; i < N; i++)
         localDiagonal[i] = 0;
@@ -82,5 +82,5 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     printf("succesfully computed diagonal.\n");
     for(int i = 0; i < N; i++)
-        printf("processor %i. %i\n", s, Diagonal[i]);
+        printf("processor %i. %i\n", s, localDiagonal[i]);
 }
