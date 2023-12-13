@@ -255,10 +255,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         }
         MPI_Barrier(comm);
         //Computed tempr.
-        if(t < 5)
-            for(int i = 0; i < N; i++)
-                printf("%i. tempr %i is %f", s, i , tempr[i]);
-
         for(int i = 0; i < numrows; i++)
         {
             int nextOffset;
@@ -269,6 +265,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             for(int j = offsets[i]; j < nextOffset; j++)
                 newres[i] += tempr[rows[j]];
             res[i] = newres[i] * prob;
+            if(t < 5)
+                printf("%i. new r at %i is %f\n", s, i, res[i]);
         }
         //Computed r.
         for(int i = 0; i < numrows; i++)
