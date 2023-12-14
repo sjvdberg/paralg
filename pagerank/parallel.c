@@ -76,7 +76,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 baseRows[i][l] = -1;
             }
         }
-        printf("\n");
+        if(output)
+            printf("\n");
     }
     if(output)
         printf("%i. Generated inlinks\n", s);
