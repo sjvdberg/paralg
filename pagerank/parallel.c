@@ -60,11 +60,15 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         for(int l = 0; l < 11; l++)
         {
             if(l <= k)
+            {
                 printf(" 1 ");
                 baseRows[i][l] = rand() % N;
+            }
             else
+            {
                 printf("   ");
                 baseRows[i][l] = -1;
+            }
         }
         printf("\n");
     }
