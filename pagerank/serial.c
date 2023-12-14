@@ -8,8 +8,7 @@ static bool output = false;
 
 void main()
 {
-    clock_t start, startloop, end;
-    start = clock();
+    clock_t start = clock();
     printf("N = %i\n", N);
     int baseRows[N][11];
     for (int i = 0; i < N; i++)
@@ -126,7 +125,7 @@ void main()
     for(int i = 0; i < N; i++)
         norm += r[i]*r[i];
     norm = sqrt(norm);
-    startloop = clock();
+    clock_t startloop = clock();
     while(norm > 0.000001)
     {
         for(int i = 0; i < N; i++)
@@ -164,11 +163,11 @@ void main()
     totNormChanges = totNormChanges / t;
     if(output)
         printf("average norm change is %f\n", totNormChanges);
-    end = clock();
-    double tottime = ((double)(end - start)) / CLOCKS_PER_SEC;
-    double initialtime = ((double)(startloop - start)) / CLOCKS_PER_SEC;
-    double looptime = ((double)(end - startloop)) / CLOCKS_PER_SEC;
-    printf("total time is %d\n", tottime);
-    printf("initial time is %d\n", initialtime);
-    printf("loop time is %d\n", looptime);
+    clock_t end = clock();
+    float tottime = ((float)(end - start)) / CLOCKS_PER_SEC;
+    float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
+    float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
+    printf("total time is %f\n", tottime);
+    printf("initial time is %f\n", initialtime);
+    printf("loop time is %f\n", looptime);
 }

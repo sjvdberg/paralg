@@ -312,11 +312,11 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     end = clock();
     if(s == 0)
     {
-        double tottime = ((double)(end - start)) / CLOCKS_PER_SEC;
-        double initialtime = ((double)(startloop - start)) / CLOCKS_PER_SEC;
-        double looptime = ((double)(end - startloop)) / CLOCKS_PER_SEC;
-        printf("total time is %d\n", tottime);
-        printf("initial time is %d\n", initialtime);
-        printf("loop time is %d\n", looptime);
+        float tottime = ((float)(end - start)) / CLOCKS_PER_SEC;
+        float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
+        float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
+        printf("total time is %f\n", tottime);
+        printf("initial time is %f\n", initialtime);
+        printf("loop time is %f\n", looptime);
     }
 }
