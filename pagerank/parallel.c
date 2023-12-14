@@ -71,29 +71,28 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         }
         printf("\n");
     }
-    printf("proces %i has computed their rows\n", s);
+    printf("%i. Generated inlinks\n", s);
     int localDiagonal[N];
     int numElements = 0;
     for(int i = 0; i < N; i++)
         localDiagonal[i] = 0;
     for(int i = 0; i < numrows; i++)
-        for(int l = 0; l < 10; l++)
+        for(int l = 0; l < 11; l++)
             if(baseRows[i][l] != -1)
             {
                 numElements++;
                 localDiagonal[baseRows[i][l]]++;
             }
-    float Diagonal[N];
+    printf("%i. Generated outlinks\n", s);
+    int numOutlinks[N];
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
     {
         if(r == s)
-        {
             for(int i = 0; i < N; i++)
-                Diagonal[i] = localDiagonal[i];
-            continue;
-        }
-        MPI_Isend(localDiagonal, N, MPI_INT, r, r, comm, &requests[r]);
+                numOutlinks[i] = localDiagonal[i];
+        else
+            MPI_Isend(localDiagonal, N, MPI_INT, r, r, comm, &requests[r]);
     }
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
@@ -101,19 +100,20 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         if(r == s) continue;
         MPI_Irecv(localDiagonal, N, MPI_INT, r, s, comm, &requests[p+r]);
         for(int i = 0; i < N; i++)
-            Diagonal[i] += localDiagonal[i];
+            numOutlinks[i] += localDiagonal[i];
     }
-    printf("succesfully computed diagonal.\n");
+    printf("%i. Computed diagonal.\n", s);
     
     for(int i = 0; i < numrows; i++)
     {
-        if(Diagonal[i + firstrow] == 0)
+        if(numOutlinks[i + firstrow] == 0)
         {
-            Diagonal[i + firstrow] = 1;
-            baseRows[i][10] = i;
             numElements++;
+            baseRows[i][10] = i;
+            numOutlinks[i + firstrow] = 1;
         }
     }
+    printf("%i. Added additional selflinks.\n", s);
     int rows[numElements];
     int offsets[numrows];
     offsets[0] = 0;
@@ -125,22 +125,22 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             if(baseRows[i][l] != -1)
             {
                 rows[k] = baseRows[i][l];
-                if(rows[k] > N)
-                    printf(" error. rows[k] = %i", rows[k]);
                 k++;
             }
         }
         if(i != numrows-1)
             offsets[i+1] = k;
     }
+    
+    float Diagonal[N];
     for(int i = 0; i < N; i++)
     {
-        if(Diagonal[i] == 0)
-            Diagonal[i] = 1;
+        if(numOutlinks[i] == 0)
+            numOutlinks[i] = 1;
         printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
-        Diagonal[i] = 1 / Diagonal[i];
+        Diagonal[i] = 1 / (float)numOutlinks[i];
     }
-
+    printf("Computed stochastic row Matrix.\n")
     float u[numrows], res[numrows], tempr[N];
     int tot = 0;
 
@@ -168,20 +168,24 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         }
     }
     for(int i = 0; i < numrows; i++)
-    {
-        u[i] = u[i] / (float)tot;
-        printf("%i u[%i] is %f\n", s, i, u[i]);
-    }
+        u[i] \= (float)tot;
+
     printf("%i Computed own u\n", s);
+    int t = 0;
+    float norms[1000];
+    for(int i = 0; i < 1000; i++)
+        norms[i] = -1;
     float prob = 0.85;
-    for(int r = 0; r < p; r++)
-        if(r != s) 
-            MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+
+    
     for(int i = 0; i < numrows; i++)
     {
         res[i] = 0;
         tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
     }
+    for(int r = 0; r < p; r++)
+        if(r != s) 
+            MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
     {
@@ -208,7 +212,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         res[i] = res[i] * prob;
         res[i] = 1 - (u[i] - res[i]);
     }
-    printf("%i. Computed residual\n", s);
+    printf("%i. Computed initial residual\n", s);
+    
     float norm = 0;
     for(int i = 0; i < numrows; i++)
         norm += res[i]*res[i];
@@ -227,15 +232,13 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     norm = sqrt(norm);
     printf("%i. Norm is %f\n", s, norm);
 
-    int t = 0;
     for(int i = 0; i < numrows; i++)
         printf("%i . r %f . u %f\n", firstrow + i, res[i], u[i]);
     while(norm > 0.000001)
     {
         for(int i = 0; i < numrows; i++)
-        {
             u[i] += res[i];
-        }
+
         //Computed u.
         float newres[numrows];
         for(int i = 0; i  < numrows; i++)
@@ -249,7 +252,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         MPI_Barrier(comm);
         
         for(int r = 0; r < p; r++)
-        {
             if(r != s) 
             {
                 float temp[numRows(N, p, r)];
@@ -258,7 +260,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 for(int i = 0; i < numRows(N, p, r); i++)
                     tempr[i + firstRow(N, p, r)] = temp[i] * Diagonal[i + firstRow(N, p, r)];;
             }
-        }
+
         MPI_Barrier(comm);
         //Computed tempr.
         for(int i = 0; i < numrows; i++)
@@ -269,8 +271,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             else
                 nextOffset = offsets[i+1];
             for(int j = offsets[i]; j < nextOffset; j++)
-                newres[i] += tempr[rows[j]];
-            res[i] += newres[i] * prob;
+                newres[i] += (float)tempr[rows[j]];
+            res[i] = newres[i] * prob;
         }
         //Computed r.
         for(int i = 0; i < numrows; i++)
@@ -287,9 +289,10 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 norm += temp;
             }
         norm = sqrt(norm);
+        norms[t] = norm;
         printf("%i. Norm in step %i is %f\n", s, t, norm);
         t++;
-        if(t > 50)
+        if(t > 100)
         {
             break;
         }

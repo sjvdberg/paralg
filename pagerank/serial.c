@@ -33,11 +33,7 @@ void main()
     for(int i = 0; i < N; i++)
         for(int j = 0; j < 11; j++)
             if(baseRows[i][j] != -1)
-            {
                 numOutlinks[baseRows[i][j]]++;
-                if(baseRows[i][j] >= N)
-                    printf("error");
-            }
 
     printf("Computed outlinks.\n");
 
@@ -75,15 +71,12 @@ void main()
         if(i != N - 1) 
             offsets[i+1] = k;
     }
-    printf("Computed stochastic row Matrix.\n");
 
     float diagonal[N];
     for(int i = 0; i < N; i++)
-    {
         diagonal[i] = 1 / (float)numOutlinks[i];
-        //printf("diagonal %i is %f.\n", i, diagonal[i]);
-    }
 
+    printf("Computed stochastic row Matrix.\n");
     float u[N], r[N], tempr[N];
     int tot = 0;
 
@@ -116,10 +109,7 @@ void main()
         else
             nextOffset = offsets[i+1];
         for(int j = offsets[i]; j < nextOffset; j++)
-        {
-
             r[i] += tempr[rows[j]];
-        }
         r[i] = r[i] * p;
         r[i] = 1 - (u[i] - r[i]);
     }
@@ -148,16 +138,12 @@ void main()
             else
                 nextOffset = offsets[i+1];
             for(int j = offsets[i]; j < nextOffset; j++)
-            {
                 r[i] +=(float)tempr[rows[j]];
-            }
             r[i] = r[i] * p;
         }
         norm = 0;
         for(int i = 0; i< N; i++)
-        {
             norm += r[i]*r[i];
-        }
         norm = sqrt(norm);
         norms[t] = norm;
         printf("Computed u and r in step %i, current norm is %f\n", t, norm);
