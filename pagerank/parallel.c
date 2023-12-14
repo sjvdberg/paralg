@@ -168,7 +168,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         }
     }
     for(int i = 0; i < numrows; i++)
-        u[i] \= (float)tot;
+        u[i] /=  (float)tot;
 
     printf("%i Computed own u\n", s);
     int t = 0;
