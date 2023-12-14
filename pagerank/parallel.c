@@ -236,38 +236,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         {
             u[i] += res[i];
         }
-        for(int r = 0; r < p; r++)
-            if(r != s) 
-                MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
-        for(int i = 0; i < numrows; i++)
-        {
-            res[i] = 0;
-            tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
-        }
-        MPI_Barrier(comm);
-        for(int r = 0; r < p; r++)
-        {
-            if(r != s) 
-            {
-                float tempu[numRows(N, p, r)];
-                MPI_Irecv(tempu, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
-                for(int i = 0; i < numRows(N, p, r); i++)
-                    tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
-            }
-        }
-        for(int i = 0; i < numrows; i++)
-        {
-            int nextOffset;
-            if(i == numrows-1)
-                nextOffset = numElements;
-            else
-                nextOffset = offsets[i+1];
-            for(int j = offsets[i]; j < nextOffset; j++)
-                res[i] += tempr[rows[j]];
-            res[i] = res[i] * prob;
-            res[i] = 1 - (u[i] - res[i]);
-        }
-        /**
         //Computed u.
         float newres[numrows];
         for(int i = 0; i  < numrows; i++)
@@ -305,7 +273,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             res[i] = newres[i] * prob;
         }
         //Computed r.
-        */
         for(int i = 0; i < numrows; i++)
             norm += res[i]*res[i];
         for(int r = 0; r < p; r++)
