@@ -52,7 +52,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     srand(time(0) + s);
     int numrows = (N+p-s-1)/p ;
     int firstrow = firstRow(N, p, s);
-    
+    print("%i . first row %i\n", s, firstRow(N,p,s));
+    print("%i . numrows %i\n", s, numRows(N,p,s));
     int baseRows[numrows][11];
     for(int i = 0; i < numrows; i++)
     {
@@ -171,18 +172,18 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < numrows; i++)
     {
         u[i] = u[i] / (float)tot;
-        printf("%i u[%i] is %f", s, i, u[i]);
+        printf("%i u[%i] is %f\n", s, i, u[i]);
     }
     printf("%i Computed own u\n", s);
     float prob = 0.85;
+    for(int r = 0; r < p; r++)
+        if(r != s) 
+            MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
     for(int i = 0; i < numrows; i++)
     {
         res[i] = 0;
         tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
     }
-    for(int r = 0; r < p; r++)
-        if(r != s) 
-            MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
     {
