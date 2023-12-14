@@ -140,7 +140,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
         Diagonal[i] = 1 / (float)numOutlinks[i];
     }
-    printf("Computed stochastic row Matrix.\n")
+    printf("Computed stochastic row Matrix.\n");
     float u[numrows], res[numrows], tempr[N];
     int tot = 0;
 
