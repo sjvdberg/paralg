@@ -275,6 +275,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             res[i] = newres[i] * prob;
         }
         //Computed r.
+        norm = 0;
         for(int i = 0; i < numrows; i++)
             norm += res[i]*res[i];
         for(int r = 0; r < p; r++)
