@@ -295,6 +295,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         if(t > 100)
         {
             break;
+            for(int i = 0; i < numrows; i++)
+                printf("%i . u %f . r %f", i, u[i], res[i]);
         }
     }
 }
