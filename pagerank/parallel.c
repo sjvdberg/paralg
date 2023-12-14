@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static bool output = true;
+static bool output = false;
 
 int main(int argc, char **argv)
 {
@@ -151,9 +151,9 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     {
         if(numOutlinks[i] == 0)
             numOutlinks[i] = 1;
+        Diagonal[i] = 1 / (float)numOutlinks[i];
         if(output)
             printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
-        Diagonal[i] = 1 / (float)numOutlinks[i];
     }
     if(output)
         printf("Computed stochastic row Matrix.\n");
