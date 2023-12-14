@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static bool output = false;
+static bool output = true;
 
 int main(int argc, char **argv)
 {
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 
     MPI_Finalize();
     fullend = clock();
-    printf("duration is %d", ((double)(fullend - fullstart) / CLOCKS_PER_SEC));
+    printf("duration is %d\n", ((double)(fullend - fullstart) / CLOCKS_PER_SEC));
     return 0;
 } /* end main */
 
