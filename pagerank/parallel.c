@@ -4,6 +4,8 @@
 #include <mpi.h>
 #include <stdlib.h>
 
+static bool output = false;
+
 int main(int argc, char **argv)
 {
     int p, s;
@@ -49,6 +51,8 @@ int firstRow(int N, int p, int s)
 //s is own rank.
 void computeVector(int N, int p, int s, MPI_Comm comm)
 {
+    clock_t start, startloop, end;
+    start = clock();
     srand(time(0) + s);
     int numrows = (N+p-s-1)/p ;
     int firstrow = firstRow(N, p, s);
@@ -71,7 +75,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         }
         printf("\n");
     }
-    printf("%i. Generated inlinks\n", s);
+    if(output)
+        printf("%i. Generated inlinks\n", s);
     int localDiagonal[N];
     int numElements = 0;
     for(int i = 0; i < N; i++)
@@ -83,7 +88,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 numElements++;
                 localDiagonal[baseRows[i][l]]++;
             }
-    printf("%i. Generated outlinks\n", s);
+    if(output)
+        printf("%i. Generated outlinks\n", s);
     int numOutlinks[N];
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
@@ -113,7 +119,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             numOutlinks[i + firstrow] = 1;
         }
     }
-    printf("%i. Added additional selflinks.\n", s);
+    if(output)
+        printf("%i. Added additional selflinks.\n", s);
     int rows[numElements];
     int offsets[numrows];
     offsets[0] = 0;
@@ -140,11 +147,11 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
         Diagonal[i] = 1 / (float)numOutlinks[i];
     }
-    printf("Computed stochastic row Matrix.\n");
+    if(output)
+        printf("Computed stochastic row Matrix.\n");
     float u[numrows], res[numrows], tempr[N];
     int tot = 0;
 
-    printf("%i Computed own rows\n", s);
     for(int i = 0; i < numrows; i++)
     {
         int k = rand() % (N*1000);
@@ -169,8 +176,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     for(int i = 0; i < numrows; i++)
         u[i] /=  (float)tot;
-
-    printf("%i Computed own u\n", s);
+    if(output)
+        printf("%i Computed own u\n", s);
     int t = 0;
     float norms[1000];
     for(int i = 0; i < 1000; i++)
@@ -197,9 +204,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
         }
     }
-    printf("%i Computed tempr\n", s);
-    for(int i = 0; i < N; i++)
-        printf("%i . tempr at %i is %f\n", s, i, tempr[i]);
+    if(output)
+        printf("%i Computed tempr\n", s);
     for(int i = 0; i < numrows; i++)
     {
         int nextOffset;
@@ -212,7 +218,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         res[i] = res[i] * prob;
         res[i] = 1 - (u[i] - res[i]);
     }
-    printf("%i. Computed initial residual\n", s);
+    if(output)
+        printf("%i. Computed initial residual\n", s);
     
     float norm = 0;
     for(int i = 0; i < numrows; i++)
@@ -230,10 +237,9 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             norm += temp;
         }
     norm = sqrt(norm);
-    printf("%i. Norm is %f\n", s, norm);
-
-    for(int i = 0; i < numrows; i++)
-        printf("%i . r %f . u %f\n", firstrow + i, res[i], u[i]);
+    if(output)
+        printf("%i. Norm is %f\n", s, norm);
+    startloop = clock();
     while(norm > 0.000001)
     {
         for(int i = 0; i < numrows; i++)
@@ -291,13 +297,18 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             }
         norm = sqrt(norm);
         norms[t] = norm;
-        printf("%i. Norm in step %i is %f\n", s, t, norm);
+        if(output)
+            printf("%i. Norm in step %i is %f\n", s, t, norm);
         t++;
-        if(t > 100)
-        {
-            for(int i = 0; i < numrows; i++)
-                printf("%i . u %f . r %f", i, u[i], res[i]);
-            break;
-        }
+    }
+    end = clock();
+    if(s == 0)
+    {
+        double tottime = ((double)(end - start)) / CLOCKS_PER_SEC;
+        double initialtime = ((double)(startloop - start)) / CLOCKS_PER_SEC;
+        double looptime = ((double)(end - startloop)) / CLOCKS_PER_SEC;
+        printf("total time is %d\n", tottime);
+        printf("initial time is %d\n", initialtime);
+        printf("loop time is %d\n", looptime);
     }
 }

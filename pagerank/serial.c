@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
+#include <time.h>
 
-static long N = 10; 
+static long N = 2000; 
+static bool output = true;
 
 void main()
 {
+    clock_t start, startloop, end;
+    start = clock();
     printf("N = %i\n", N);
     int baseRows[N][11];
     for (int i = 0; i < N; i++)
@@ -23,8 +27,8 @@ void main()
             }
         }
     }
-
-    printf("Generated inlinks.\n");
+    if(output)
+        printf("Generated inlinks.\n");
 
     //Get number of Outlinks.
     int numOutlinks[N];
@@ -34,8 +38,8 @@ void main()
         for(int j = 0; j < 11; j++)
             if(baseRows[i][j] != -1)
                 numOutlinks[baseRows[i][j]]++;
-
-    printf("Computed outlinks.\n");
+    if(output)
+        printf("Computed outlinks.\n");
 
     int numElements = 0;
     for (int i = 0; i < N; i++)
@@ -51,8 +55,8 @@ void main()
             numElements += numOutlinks[i];
         }
     }
-
-    printf("Added additional outlinks.\n");
+    if(output)
+        printf("Added additional outlinks.\n");
     int rows[numElements];
     int offsets[N];
     offsets[0] = 0;
@@ -76,7 +80,8 @@ void main()
     for(int i = 0; i < N; i++)
         diagonal[i] = 1 / (float)numOutlinks[i];
 
-    printf("Computed stochastic row Matrix.\n");
+    if(output)
+        printf("Computed stochastic row Matrix.\n");
     float u[N], r[N], tempr[N];
     int tot = 0;
 
@@ -89,7 +94,8 @@ void main()
     for(int i = 0; i < N; i++)
         u[i] /= tot;
 
-    printf("Computed initial u.\n");
+    if(output)
+        printf("Computed initial u.\n");
     int t = 0;
     float norms[1000];
     for(int i = 0; i <1000; i++)
@@ -113,14 +119,14 @@ void main()
         r[i] = r[i] * p;
         r[i] = 1 - (u[i] - r[i]);
     }
-    printf("Computed initial r.\n");
+    if(output)
+        printf("Computed initial r.\n");
 
     float norm = 0;
     for(int i = 0; i < N; i++)
         norm += r[i]*r[i];
     norm = sqrt(norm);
-    for(int i = 0; i < N; i++)
-        printf("u %f . r %f\n", u[i], r[i]);
+    startloop = clock();
     while(norm > 0.000001)
     {
         for(int i = 0; i < N; i++)
@@ -146,7 +152,8 @@ void main()
             norm += r[i]*r[i];
         norm = sqrt(norm);
         norms[t] = norm;
-        printf("Computed u and r in step %i, current norm is %f\n", t, norm);
+        if(output)
+            printf("Computed u and r in step %i, current norm is %f\n", t, norm);
         t++;
     }
     float totNormChanges = 0;
@@ -155,5 +162,13 @@ void main()
         totNormChanges += (norms[i+1]/norms[i]);
     }
     totNormChanges = totNormChanges / t;
-    printf("average norm change is %f\n", totNormChanges);
+    if(output)
+        printf("average norm change is %f\n", totNormChanges);
+    end = clock();
+    double tottime = ((double)(end - start)) / CLOCKS_PER_SEC;
+    double initialtime = ((double)(startloop - start)) / CLOCKS_PER_SEC;
+    double looptime = ((double)(end - startloop)) / CLOCKS_PER_SEC;
+    printf("total time is %d\n", tottime);
+    printf("initial time is %d\n", initialtime);
+    printf("loop time is %d\n", looptime);
 }
