@@ -60,10 +60,13 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         for(int l = 0; l < 11; l++)
         {
             if(l <= k)
+                printf(" 1 ");
                 baseRows[i][l] = rand() % N;
             else
+                printf("   ");
                 baseRows[i][l] = -1;
         }
+        printf("\n");
     }
     printf("proces %i has computed their rows\n", s);
     int localDiagonal[N];
@@ -131,6 +134,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     {
         if(Diagonal[i] == 0)
             Diagonal[i] = 1;
+        printf("%i. Diagonal at %i is %f", s, i, Diagonal[i]);
         Diagonal[i] = 1 / Diagonal[i];
     }
 
@@ -229,7 +233,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         {
             u[i] += res[i];
         }
-        printf("%i new u[0] is %f\n", s, u[0]);
         //Computed u.
         float newres[numrows];
         for(int i = 0; i  < numrows; i++)
@@ -265,8 +268,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             for(int j = offsets[i]; j < nextOffset; j++)
                 newres[i] += tempr[rows[j]];
             res[i] = newres[i] * prob;
-            if(t < 5)
-                printf("%i. new r at %i is %f\n", s, i, res[i]);
         }
         //Computed r.
         for(int i = 0; i < numrows; i++)
