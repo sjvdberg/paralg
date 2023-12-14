@@ -52,8 +52,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     srand(time(0) + s);
     int numrows = (N+p-s-1)/p ;
     int firstrow = firstRow(N, p, s);
-    print("%i . first row %i\n", s, firstRow(N,p,s));
-    print("%i . numrows %i\n", s, numRows(N,p,s));
+    printf("%i . first row %i\n", s, firstRow(N,p,s));
+    printf("%i . numrows %i\n", s, numRows(N,p,s));
     int baseRows[numrows][11];
     for(int i = 0; i < numrows; i++)
     {
