@@ -204,8 +204,13 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         else
             nextOffset = offsets[i+1];
         for(int j = offsets[i]; j < nextOffset; j++)
+        {
+            if(i == 0)
+                printf("added %f to %f", tempr[rows[j]], res[i]);
             res[i] += tempr[rows[j]];
+        }
         res[i] = res[i] * prob;
+        printf("res %i is %f\n", i, res[i]);
         res[i] = 1 - (u[i] - res[i]);
     }
     printf("%i. Computed residual\n", s);
