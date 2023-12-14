@@ -9,6 +9,8 @@ static bool output = false;
 
 int main(int argc, char **argv)
 {
+    clock_t fullstart, fullend;
+    fullstart = clock();
     int p, s;
 
     /* SPMD part */
@@ -25,6 +27,8 @@ int main(int argc, char **argv)
     computeVector(n, p, s, MPI_COMM_WORLD);
 
     MPI_Finalize();
+    fullend = clock();
+    printf("duration is %d", ((double)(fullend - fullstart) / CLOCKS_PER_SEC));
     return 0;
 } /* end main */
 
