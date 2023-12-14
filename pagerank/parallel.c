@@ -61,8 +61,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         {
             if(l <= k)
             {
-                printf(" 1 ");
                 baseRows[i][l] = rand() % N;
+                printf(" %i ", baseRows[i][l]);
             }
             else
             {
@@ -138,7 +138,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     {
         if(Diagonal[i] == 0)
             Diagonal[i] = 1;
-        printf("%i. Diagonal at %i is %f", s, i, Diagonal[i]);
+        printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
         Diagonal[i] = 1 / Diagonal[i];
     }
 
