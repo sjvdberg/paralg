@@ -3,6 +3,7 @@
 #include <math.h>
 #include <mpi.h>
 #include <stdlib.h>
+#include <time.h>
 
 static bool output = false;
 
