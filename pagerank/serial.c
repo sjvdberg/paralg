@@ -3,8 +3,8 @@
 #include <math.h>
 #include <time.h>
 
-static long N = 2000; 
-static bool output = true;
+static long N = 10000; 
+static bool output = false;
 
 void main()
 {

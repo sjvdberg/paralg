@@ -66,11 +66,13 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             if(l <= k)
             {
                 baseRows[i][l] = rand() % N;
-                printf(" %i ", baseRows[i][l]);
+                if(output)
+                    printf(" %i ", baseRows[i][l]);
             }
             else
             {
-                printf("   ");
+                if(output)
+                    printf("   ");
                 baseRows[i][l] = -1;
             }
         }
@@ -89,8 +91,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 numElements++;
                 localDiagonal[baseRows[i][l]]++;
             }
-    if(output)
-        printf("%i. Generated outlinks\n", s);
     int numOutlinks[N];
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
@@ -109,7 +109,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         for(int i = 0; i < N; i++)
             numOutlinks[i] += localDiagonal[i];
     }
-    printf("%i. Computed diagonal.\n", s);
+    if(output)
+        printf("%i. Generated outlinks.\n", s);
     
     for(int i = 0; i < numrows; i++)
     {
@@ -145,7 +146,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     {
         if(numOutlinks[i] == 0)
             numOutlinks[i] = 1;
-        printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
+        if(output)
+            printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
         Diagonal[i] = 1 / (float)numOutlinks[i];
     }
     if(output)
