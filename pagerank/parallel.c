@@ -139,8 +139,10 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
     {
+       
         if(r != s)
         {
+             printf("%i. There are %i ougoing links.\n", i, outgoingDiagonal[r]);
             for(int i = 0; i < outgoingDiagonal[r]; i++)
                 printf("%i. Sending %i\n", s, outgoingLinks[outOffsets[r + i]]);
             MPI_Isend(&outgoingDiagonal[r], 1, MPI_INT, r, r, comm, &requests[r]);
