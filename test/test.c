@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
         for(int i = 0; i < 20; i++)
             arr[i] = i;
         
-        MPI_Send(arr, 5, MPI_INT, 1, 1, MPI_COMM_WORLD);
+        MPI_Send(&arr[0], 5, MPI_INT, 1, 1, MPI_COMM_WORLD);
         printf("Message Sent:\n");
         for(int i = 0; i < 5; i++)
             printf("%i. %i\n", process_Rank, i);
