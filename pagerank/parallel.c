@@ -138,8 +138,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     {
         if(r != s)
         {
-            MPI_Isend(outgoingDiagonal[r], 1, MPI_INT, r, r, comm, &requests[r]);
-            MPI_Isend(outgoingLinks[outOffsets[r]], outgoingDiagonal[r], MPI_INT, r, r, comm, &requests[r]);
+            MPI_Isend(&outgoingDiagonal[r], 1, MPI_INT, r, r, comm, &requests[r]);
+            MPI_Isend(&outgoingLinks[outOffsets[r]], outgoingDiagonal[r], MPI_INT, r, r, comm, &requests[r]);
         }
     }
     MPI_Barrier(comm);
