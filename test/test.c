@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
         MPI_Send(arr[10], 5, MPI_INT, 1, 1, MPI_COMM_WORLD);
         printf("Message Sent: %d\n", message_Item);
         for(int i = 10; i < 15; i++)
-            printf(i);
+            printf("%i", i);
     }
 
     else if(process_Rank == 1){
@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
         MPI_Recv(receive, 5, MPI_INT, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         printf("Message Received:\n");
         for(int i = 0; i < 5; i++)
-            printf(i);
+            printf("%i", i);
     }
 
     MPI_Finalize();
