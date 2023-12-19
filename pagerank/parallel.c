@@ -335,9 +335,11 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             }
         norm = sqrt(norm);
         norms[t] = norm;
-        if(output)
+        if(output && t < 5)
             printf("%i. Norm in step %i is %f\n", s, t, norm);
         t++;
+        if(t > 1000)
+            break
     }
     end = clock();
     if(s == 0)
