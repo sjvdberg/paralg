@@ -128,7 +128,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             if(baseRows[i][l] != -1)
             {
                 int j = baseRows[i][l];
-                if(j < firstrow && j > lastrow)
+                if(j < firstrow || j > lastrow)
                 {
                     outgoingLinks[tempOffsets[pLoc(N, p, j)]] = j;
                     tempOffsets[pLoc(N, p, j)]++;
@@ -142,7 +142,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
        
         if(r != s)
         {
-             printf("%i. There are %i ougoing links.\n", s, outgoingDiagonal[r]);
+             printf("%i. There are %i outgoing links.\n", s, outgoingDiagonal[r]);
             for(int i = 0; i < outgoingDiagonal[r]; i++)
                 printf("%i. Sending %i\n", s, outgoingLinks[outOffsets[r + i]]);
             MPI_Isend(&outgoingDiagonal[r], 1, MPI_INT, r, r, comm, &requests[r]);
