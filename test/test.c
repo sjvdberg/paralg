@@ -13,9 +13,9 @@ int main(int argc, char** argv) {
         for(int i = 0; i < 20; i++)
             arr[i] = i;
         
-        MPI_Send(arr[10], 5, MPI_INT, 1, 1, MPI_COMM_WORLD);
+        MPI_Send(arr, 5, MPI_INT, 1, 1, MPI_COMM_WORLD);
         printf("Message Sent: %d\n", message_Item);
-        for(int i = 10; i < 15; i++)
+        for(int i = 0; i < 5; i++)
             printf("%i", i);
     }
 
