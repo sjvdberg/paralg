@@ -119,7 +119,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     int outgoingLinks[numElements];
     int outOffsets[p];
     int tempOffsets[p];
-    outOffsets[0] tempOffsets[0] = 0;
+    outOffsets[0] = tempOffsets[0] = 0;
     for(int r = 0; r < p - 1; r++)
         outOffsets[r+1] = tempOffsets[r+1] = outOffsets[r] + outgoingDiagonal[r];
     for(int i = 0; i < numrows; i++)
@@ -129,8 +129,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 int j = baseRows[i][l];
                 if(j < firstrow && j > lastrow)
                 {
-                    outgoingLinks[tempOffsets[pLoc[N, p, j]]] = j;
-                    tempOffsets[pLoc[N, p, j]]++;
+                    outgoingLinks[tempOffsets[pLoc(N, p, j)]] = j;
+                    tempOffsets[pLoc(N, p, j)]++;
                 }
             }
     MPI_Request requests[2*p];
@@ -246,7 +246,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
         if(r != s) 
-            MPI_Irecv(&tempr[i + firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
+            MPI_Irecv(&tempr[firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
     if(output)
         printf("%i Computed tempr\n", s);
     for(int i = 0; i < numrows; i++)
@@ -303,7 +303,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         
         for(int r = 0; r < p; r++)
             if(r != s) 
-                MPI_Irecv(&tempr[i + firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
+                MPI_Irecv(&tempr[firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
 
         MPI_Barrier(comm);
         //Computed tempr.
