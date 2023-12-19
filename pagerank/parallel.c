@@ -141,6 +141,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     {
         if(r != s)
         {
+            for(int i = 0; i < outgoingDiagonal[r] i++)
+                printf("%i. Sending %i", s, outgoingLinks[outOffsets[r + i]]);
             MPI_Isend(&outgoingDiagonal[r], 1, MPI_INT, r, r, comm, &requests[r]);
             MPI_Isend(&outgoingLinks[outOffsets[r]], outgoingDiagonal[r], MPI_INT, r, r, comm, &requests[r]);
         }
@@ -155,6 +157,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         MPI_Irecv(incoming, size, MPI_INT, r, s, comm, &requests[p+r]);
         for(int i = 0; i < size; i++)
         {
+            printf("%i. Incoming %i", s. incoming[i]);
             localDiagonal[incoming[i]]++;
         }
     }
@@ -197,7 +200,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             localDiagonal[i] = 1;
         Diagonal[i] = 1 / (float)localDiagonal[i];
         if(output)
-            printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
+            printf("%i. Diagonal at %i is %f\n", s, i + firstrow, Diagonal[i]);
     }
     if(output)
         printf("Computed stochastic row Matrix.\n");
