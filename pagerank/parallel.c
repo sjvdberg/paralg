@@ -97,7 +97,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     if(output)
         printf("%i. Generated inlinks\n", s);
-    int localDiagonal[numRows];
+    int localDiagonal[numrows];
     int outgoingDiagonal[p];
     int numElements = 0;
     for(int i = 0; i < N; i++)
@@ -113,7 +113,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 if(j >= firstrow && j <= lastrow)
                     localDiagonal[j - firstrow]++;
                 else
-                    outgoingDiagonal[pLoc(j)]++;
+                    outgoingDiagonal[pLoc(N, p, j)]++;
 
             }
     int outgoingLinks[numElements];
@@ -129,8 +129,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 int j = baseRows[i][l];
                 if(j < firstrow && j > lastrow)
                 {
-                    outgoingLinks[tempOffsets[pLoc[j]]] = j;
-                    tempOffsets[pLoc[j]]++;
+                    outgoingLinks[tempOffsets[pLoc[N, p, j]]] = j;
+                    tempOffsets[pLoc[N, p, j]]++;
                 }
             }
     MPI_Request requests[2*p];
