@@ -339,7 +339,10 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             printf("%i. Norm in step %i is %f\n", s, t, norm);
         t++;
         if(t > 1000)
+        {
+            printf("broke at norm size %f", norm);
             break;
+        }
     }
     end = clock();
     if(s == 0)
