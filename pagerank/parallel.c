@@ -52,6 +52,16 @@ int firstRow(int N, int p, int s)
     return firstrow;
 }
 
+int pLoc(int N, int p, int j)
+{
+    int remainder = N % p;
+    int numrows = N / p;
+    if(j < remainder * (numrows + 1))
+        return j / (numrows + 1);
+    else
+        return j / numrows - remainder;
+}
+
 //n is number of rows/columns.
 //p is number of processors.
 //s is own rank.
@@ -62,6 +72,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     srand(time(0) + s);
     int numrows = (N+p-s-1)/p ;
     int firstrow = firstRow(N, p, s);
+    int lastrow = firstrow + numrows - 1;
     int baseRows[numrows][11];
     for(int i = 0; i < numrows; i++)
     {
@@ -86,45 +97,74 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     if(output)
         printf("%i. Generated inlinks\n", s);
-    int localDiagonal[N];
+    int localDiagonal[numRows];
+    int outgoingDiagonal[p];
     int numElements = 0;
     for(int i = 0; i < N; i++)
         localDiagonal[i] = 0;
+    for(int r = 0; r < p; r++)
+        outgoingDiagonal[r] = 0;
     for(int i = 0; i < numrows; i++)
         for(int l = 0; l < 11; l++)
             if(baseRows[i][l] != -1)
             {
                 numElements++;
-                localDiagonal[baseRows[i][l]]++;
+                int j = baseRows[i][l];
+                if(j >= firstrow && j <= lastrow)
+                    localDiagonal[j - firstrow]++;
+                else
+                    outgoingDiagonal[pLoc(j)]++;
+
             }
-    int numOutlinks[N];
+    int outgoingLinks[numElements];
+    int outOffsets[p];
+    int tempOffsets[p];
+    outOffsets[0] tempOffsets[0] = 0;
+    for(int r = 0; r < p - 1; r++)
+        outOffsets[r+1] = tempOffsets[r+1] = outOffsets[r] + outgoingDiagonal[r];
+    for(int i = 0; i < numrows; i++)
+        for(int l = 0; l < 11; l++)
+            if(baseRows[i][l] != -1)
+            {
+                int j = baseRows[i][l];
+                if(j < firstrow && j > lastrow)
+                {
+                    outgoingLinks[tempOffsets[pLoc[j]]] = j;
+                    tempOffsets[pLoc[j]]++;
+                }
+            }
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
     {
-        if(r == s)
-            for(int i = 0; i < N; i++)
-                numOutlinks[i] = localDiagonal[i];
-        else
-            MPI_Isend(localDiagonal, N, MPI_INT, r, r, comm, &requests[r]);
+        if(r != s)
+        {
+            MPI_Isend(outgoingDiagonal[r], 1, MPI_INT, r, r, comm, &requests[r]);
+            MPI_Isend(outgoingLinks[outOffsets[r]], outgoingDiagonal[r], MPI_INT, r, r, comm, &requests[r]);
+        }
     }
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
     {
         if(r == s) continue;
-        MPI_Irecv(localDiagonal, N, MPI_INT, r, s, comm, &requests[p+r]);
-        for(int i = 0; i < N; i++)
-            numOutlinks[i] += localDiagonal[i];
+        int size;
+        MPI_Irecv(&size, 1, MPI_INT, r, s, comm, &requests[p+r]);
+        int incoming[size];
+        MPI_Irecv(incoming, size, MPI_INT, r, s, comm, &requests[p+r]);
+        for(int i = 0; i < size; i++)
+        {
+            localDiagonal[incoming[i]]++;
+        }
     }
     if(output)
         printf("%i. Generated outlinks.\n", s);
     
     for(int i = 0; i < numrows; i++)
     {
-        if(numOutlinks[i + firstrow] == 0)
+        if(localDiagonal[i] == 0)
         {
             numElements++;
             baseRows[i][10] = i;
-            numOutlinks[i + firstrow] = 1;
+            localDiagonal[i] = 1;
         }
     }
     if(output)
@@ -147,12 +187,12 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             offsets[i+1] = k;
     }
     
-    float Diagonal[N];
-    for(int i = 0; i < N; i++)
+    float Diagonal[numrows];
+    for(int i = 0; i < numrows; i++)
     {
-        if(numOutlinks[i] == 0)
-            numOutlinks[i] = 1;
-        Diagonal[i] = 1 / (float)numOutlinks[i];
+        if(localDiagonal[i] == 0)
+            localDiagonal[i] = 1;
+        Diagonal[i] = 1 / (float)localDiagonal[i];
         if(output)
             printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
     }
@@ -197,22 +237,16 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < numrows; i++)
     {
         res[i] = 0;
-        tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
+        u[i] = u[i] * Diagonal[i];
+        tempr[firstrow + i] = u[i];
     }
     for(int r = 0; r < p; r++)
         if(r != s) 
             MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
-    {
         if(r != s) 
-        {
-            float tempu[numRows(N, p, r)];
-            MPI_Irecv(tempu, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
-            for(int i = 0; i < numRows(N, p, r); i++)
-                tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
-        }
-    }
+            MPI_Irecv(&tempr[i + firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
     if(output)
         printf("%i Computed tempr\n", s);
     for(int i = 0; i < numrows; i++)
@@ -258,7 +292,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         float newres[numrows];
         for(int i = 0; i  < numrows; i++)
         {
-            tempr[i + firstrow] = res[i]*Diagonal[i + firstrow];
+            res[i] *= Diagonal[i];
+            tempr[i + firstrow] = res[i];
             newres[i] = 0;
         }
         for(int r = 0; r < p; r++)
@@ -268,13 +303,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         
         for(int r = 0; r < p; r++)
             if(r != s) 
-            {
-                float temp[numRows(N, p, r)];
-                MPI_Irecv(temp, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
-
-                for(int i = 0; i < numRows(N, p, r); i++)
-                    tempr[i + firstRow(N, p, r)] = temp[i] * Diagonal[i + firstRow(N, p, r)];;
-            }
+                MPI_Irecv(&tempr[i + firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
 
         MPI_Barrier(comm);
         //Computed tempr.
