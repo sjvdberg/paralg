@@ -155,6 +155,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         int incoming[size];
         printf("%i. There are %i incomign links.\n", s, size);
         MPI_Irecv(incoming, size, MPI_INT, r, s, comm, &requests[p+r]);
+        printf("%i. received", s)
         for(int i = 0; i < size; i++)
         {
             printf("%i. Incoming %i\n", s, incoming[i]);
