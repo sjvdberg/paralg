@@ -139,15 +139,10 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
     {
-       
-        if(r != s)
-        {
-             printf("%i. There are %i outgoing links.\n", s, outgoingDiagonal[r]);
-            for(int i = 0; i < outgoingDiagonal[r]; i++)
-                printf("%i. Sending %i\n", s, outgoingLinks[outOffsets[r + i]]);
-            MPI_Isend(&outgoingDiagonal[r], 1, MPI_INT, r, r, comm, &requests[r]);
-            MPI_Isend(&outgoingLinks[outOffsets[r]], outgoingDiagonal[r], MPI_INT, r, r, comm, &requests[r]);
-        }
+        if(r == s) continue;
+        printf("%i. There are %i outgoing links.\n", s, outgoingDiagonal[r]);
+        MPI_Isend(&outgoingDiagonal[r], 1, MPI_INT, r, r, comm, &requests[r]);
+        MPI_Isend(&outgoingLinks[outOffsets[r]], outgoingDiagonal[r], MPI_INT, r, r, comm, &requests[r]);
     }
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
@@ -160,7 +155,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         for(int i = 0; i < size; i++)
         {
             printf("%i. Incoming %i\n", s, incoming[i]);
-            localDiagonal[incoming[i]]++;
+            localDiagonal[incoming[i - firstrow]]++;
         }
     }
     if(output)
