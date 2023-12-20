@@ -258,7 +258,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         float newres[numrows];
         for(int i = 0; i  < numrows; i++)
         {
-            res[i] *=Diaognal[i+firstrow];
+            res[i] *= Diagonal[i+firstrow];
             tempr[i + firstrow] = res[i];
             newres[i] = 0;
         }
