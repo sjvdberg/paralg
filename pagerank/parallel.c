@@ -154,7 +154,9 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         int incoming[size];
         MPI_Irecv(incoming, size, MPI_INT, r, s, comm, &requests[p+r]);
         for(int i = 0; i < size; i++)
+        {
             localDiagonal[incoming[i] - firstrow]++;
+        }
     }
     MPI_Barrier(comm);
     if(output)
@@ -231,12 +233,11 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < numrows; i++)
     {
         res[i] = 0;
-        u[i] = u[i] * Diagonal[i];
-        tempr[firstrow + i] = u[i];
+        tempr[firstrow + i] = u[i] * Diagonal[i];
     }
     for(int r = 0; r < p; r++)
         if(r != s) 
-            MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+            MPI_Isend(&tempr[firstrow], numrows, MPI_FLOAT, r, r, comm, &requests[r]);
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
         if(r != s) 

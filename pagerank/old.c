@@ -258,7 +258,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         float newres[numrows];
         for(int i = 0; i  < numrows; i++)
         {
-            tempr[i + firstrow] = res[i]*Diagonal[i + firstrow];
+            res[i] *=Diaognal[i+firstrow];
+            tempr[i + firstrow] = res[i];
             newres[i] = 0;
         }
         for(int r = 0; r < p; r++)
@@ -268,13 +269,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         
         for(int r = 0; r < p; r++)
             if(r != s) 
-            {
-                float temp[numRows(N, p, r)];
-                MPI_Irecv(temp, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
-
-                for(int i = 0; i < numRows(N, p, r); i++)
-                    tempr[i + firstRow(N, p, r)] = temp[i] * Diagonal[i + firstRow(N, p, r)];;
-            }
+                MPI_Irecv(&tempr[firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
 
         MPI_Barrier(comm);
         //Computed tempr.
