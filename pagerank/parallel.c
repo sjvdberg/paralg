@@ -83,17 +83,17 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             if(l <= k)
             {
                 baseRows[i][l] = rand() % N;
-                if(output && i < 10)
+                if(output && i < 2)
                     printf(" %i ", baseRows[i][l]);
             }
             else
             {
-                if(output && i < 10)
+                if(output && i < 2)
                     printf("   ");
                 baseRows[i][l] = -1;
             }
         }
-        if(output)
+        if(output && i < 2)
             printf("\n");
     }
     if(output)
@@ -337,7 +337,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             }
         norm = sqrt(norm);
         norms[t] = norm;
-        if(output && t < 5)
+        if(output && t < 1)
             printf("%i. Norm in step %i is %f\n", s, t, norm);
         t++;
         if(t > 1000)
