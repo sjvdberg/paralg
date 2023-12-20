@@ -74,11 +74,11 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     int numrows = (N+p-s-1)/p ;
     int firstrow = firstRow(N, p, s);
     int lastrow = firstrow + numrows - 1;
-    int baseRows[numrows][11];
+    int baseRows[numrows][10];
     for(int i = 0; i < numrows; i++)
     {
         int k = rand() % 10;
-        for(int l = 0; l < 11; l++)
+        for(int l = 0; l < 10; l++)
         {
             if(l <= k)
             {
@@ -106,7 +106,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int r = 0; r < p; r++)
         outgoingDiagonal[r] = 0;
     for(int i = 0; i < numrows; i++)
-        for(int l = 0; l < 11; l++)
+        for(int l = 0; l < 10; l++)
             if(baseRows[i][l] != -1)
             {
                 numElements++;
@@ -125,7 +125,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int r = 0; r < p - 1; r++)
         outOffsets[r+1] = tempOffsets[r+1] = outOffsets[r] + outgoingDiagonal[r];
     for(int i = 0; i < numrows; i++)
-        for(int l = 0; l < 11; l++)
+        for(int l = 0; l < 10; l++)
             if(baseRows[i][l] != -1)
             {
                 int j = baseRows[i][l];
@@ -160,15 +160,6 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     if(output)
         printf("%i. Generated outlinks.\n", s);
     
-    for(int i = 0; i < numrows; i++)
-    {
-        if(localDiagonal[i] == 0)
-        {
-            numElements++;
-            baseRows[i][10] = i;
-            localDiagonal[i] = 1;
-        }
-    }
     if(output)
         printf("%i. Added additional selflinks.\n", s);
     int rows[numElements];
@@ -177,7 +168,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < numrows; i++)
     {
         int k = offsets[i];
-        for(int l = 0; l < 11; l++)
+        for(int l = 0; l < 10; l++)
         {
             if(baseRows[i][l] != -1)
             {
