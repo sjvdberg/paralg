@@ -210,7 +210,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             float tempu[numRows(N, p, r)];
             MPI_Irecv(tempu, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
             for(int i = 0; i < numRows(N, p, r); i++)
-                tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
+                tempr[i + firstRow(N, p, r)] = tempu[i];
         }
     }
     if(output)
