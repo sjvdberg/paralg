@@ -24,6 +24,7 @@ int main(int argc, char **argv)
 
     for(int i = 10; i <= n; i *= 10)
     {
+        MPI_Barrier(MPI_COMM_WORLD);
         if(s == 0)
             printf("Computing n = %i.\n", i);
         computeVector(i, p, s, MPI_COMM_WORLD);
@@ -52,6 +53,16 @@ int firstRow(int N, int p, int s)
     return firstrow;
 }
 
+int pLoc(int N, int p, int j)
+{
+    int remainder = N % p;
+    int numrows = N / p;
+    if(j < remainder * (numrows + 1))
+        return j / (numrows + 1);
+    else
+        return j / numrows - remainder;
+}
+
 //n is number of rows/columns.
 //p is number of processors.
 //s is own rank.
@@ -62,71 +73,95 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     srand(time(0) + s);
     int numrows = (N+p-s-1)/p ;
     int firstrow = firstRow(N, p, s);
-    int baseRows[numrows][11];
+    int lastrow = firstrow + numrows - 1;
+    int baseRows[numrows][10];
     for(int i = 0; i < numrows; i++)
     {
         int k = rand() % 10;
-        for(int l = 0; l < 11; l++)
+        for(int l = 0; l < 10; l++)
         {
             if(l <= k)
             {
                 baseRows[i][l] = rand() % N;
-                if(output)
+                if(output && i < 2)
                     printf(" %i ", baseRows[i][l]);
             }
             else
             {
-                if(output)
+                if(output && i < 2)
                     printf("   ");
                 baseRows[i][l] = -1;
             }
         }
-        if(output)
+        if(output && i < 2)
             printf("\n");
     }
     if(output)
         printf("%i. Generated inlinks\n", s);
-    int localDiagonal[N];
+    int localDiagonal[numrows];
+    int outgoingDiagonal[p];
     int numElements = 0;
     for(int i = 0; i < N; i++)
         localDiagonal[i] = 0;
+    for(int r = 0; r < p; r++)
+        outgoingDiagonal[r] = 0;
     for(int i = 0; i < numrows; i++)
-        for(int l = 0; l < 11; l++)
+        for(int l = 0; l < 10; l++)
             if(baseRows[i][l] != -1)
             {
                 numElements++;
-                localDiagonal[baseRows[i][l]]++;
+                int j = baseRows[i][l];
+                if(j >= firstrow && j <= lastrow)
+                    localDiagonal[j - firstrow]++;
+                else
+                    outgoingDiagonal[pLoc(N, p, j)]++;
             }
-    int numOutlinks[N];
+    if(output)
+        printf("%i. Generated local and outgoing diagonals.\n", s);
+    int outgoingLinks[numElements];
+    int outOffsets[p];
+    int tempOffsets[p];
+    outOffsets[0] = tempOffsets[0] = 0;
+    for(int r = 0; r < p - 1; r++)
+        outOffsets[r+1] = tempOffsets[r+1] = outOffsets[r] + outgoingDiagonal[r];
+    for(int i = 0; i < numrows; i++)
+        for(int l = 0; l < 10; l++)
+            if(baseRows[i][l] != -1)
+            {
+                int j = baseRows[i][l];
+                if(j < firstrow || j > lastrow)
+                {
+                    outgoingLinks[tempOffsets[pLoc(N, p, j)]] = j;
+                    tempOffsets[pLoc(N, p, j)]++;
+                }
+            }
+    if(output)
+        printf("%i Generated Outgoing links.\n", s);
     MPI_Request requests[2*p];
     for(int r = 0; r < p; r++)
     {
-        if(r == s)
-            for(int i = 0; i < N; i++)
-                numOutlinks[i] = localDiagonal[i];
-        else
-            MPI_Isend(localDiagonal, N, MPI_INT, r, r, comm, &requests[r]);
+        if(r == s) continue;
+        MPI_Isend(&outgoingDiagonal[r], 1, MPI_INT, r, r, comm, &requests[r]);
+        MPI_Isend(&outgoingLinks[outOffsets[r]], outgoingDiagonal[r], MPI_INT, r, r, comm, &requests[r]);
     }
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
     {
         if(r == s) continue;
-        MPI_Irecv(localDiagonal, N, MPI_INT, r, s, comm, &requests[p+r]);
-        for(int i = 0; i < N; i++)
-            numOutlinks[i] += localDiagonal[i];
+        int size;
+        
+        MPI_Irecv(&size, 1, MPI_INT, r, s, comm, &requests[p+r]);
+        int incoming[size];
+        MPI_Irecv(incoming, size, MPI_INT, r, s, comm, &requests[p+r]);
+        for(int i = 0; i < size; i++)
+        {
+            localDiagonal[incoming[i] - firstrow]++;
+        }
     }
+    MPI_Barrier(comm);
     if(output)
         printf("%i. Generated outlinks.\n", s);
     
-    for(int i = 0; i < numrows; i++)
-    {
-        if(numOutlinks[i + firstrow] == 0)
-        {
-            numElements++;
-            baseRows[i][10] = i;
-            numOutlinks[i + firstrow] = 1;
-        }
-    }
     if(output)
         printf("%i. Added additional selflinks.\n", s);
     int rows[numElements];
@@ -135,7 +170,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < numrows; i++)
     {
         int k = offsets[i];
-        for(int l = 0; l < 11; l++)
+        for(int l = 0; l < 10; l++)
         {
             if(baseRows[i][l] != -1)
             {
@@ -147,14 +182,14 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             offsets[i+1] = k;
     }
     
-    float Diagonal[N];
-    for(int i = 0; i < N; i++)
+    float Diagonal[numrows];
+    for(int i = 0; i < numrows; i++)
     {
-        if(numOutlinks[i] == 0)
-            numOutlinks[i] = 1;
-        Diagonal[i] = 1 / (float)numOutlinks[i];
-        if(output)
-            printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
+        if(localDiagonal[i] == 0)
+            localDiagonal[i] = 1;
+        Diagonal[i] = 1 / (float)localDiagonal[i];
+        if(output && i < 10)
+            printf("%i. Diagonal at %i is %f\n", s, i + firstrow, Diagonal[i]);
     }
     if(output)
         printf("Computed stochastic row Matrix.\n");
@@ -183,6 +218,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             tot += temptot;
         }
     }
+    MPI_Barrier(comm);
     for(int i = 0; i < numrows; i++)
         u[i] /=  (float)tot;
     if(output)
@@ -197,24 +233,18 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < numrows; i++)
     {
         res[i] = 0;
-        tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
+        tempr[firstrow + i] = u[i] * Diagonal[i];
     }
     for(int r = 0; r < p; r++)
         if(r != s) 
-            MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+            MPI_Isend(&tempr[firstrow], numrows, MPI_FLOAT, r, r, comm, &requests[r]);
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
-    {
         if(r != s) 
-        {
-            float tempu[numRows(N, p, r)];
-            MPI_Irecv(tempu, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
-            for(int i = 0; i < numRows(N, p, r); i++)
-                tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
-        }
-    }
+            MPI_Irecv(&tempr[firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
     if(output)
         printf("%i Computed tempr\n", s);
+    MPI_Barrier(comm);
     for(int i = 0; i < numrows; i++)
     {
         int nextOffset;
@@ -245,6 +275,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
             norm += temp;
         }
+    MPI_Barrier(comm);
     norm = sqrt(norm);
     if(output)
         printf("%i. Norm is %f\n", s, norm);
@@ -258,7 +289,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         float newres[numrows];
         for(int i = 0; i  < numrows; i++)
         {
-            res[i] *=Diaognal[i+firstrow];
+            res[i] *= Diagonal[i];
             tempr[i + firstrow] = res[i];
             newres[i] = 0;
         }
@@ -299,15 +330,22 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
                 norm += temp;
             }
+        MPI_Barrier(comm);
         norm = sqrt(norm);
         norms[t] = norm;
-        if(output)
+        if(output && t < 1)
             printf("%i. Norm in step %i is %f\n", s, t, norm);
         t++;
+        if(t > 1000)
+        {
+            printf("broke at norm size %f", norm);
+            break;
+        }
     }
     end = clock();
     if(s == 0)
     {
+        printf("Finished in %i steps.\n", t);
         float tottime = ((float)(end - start)) / CLOCKS_PER_SEC;
         float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
         float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
