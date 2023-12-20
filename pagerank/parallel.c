@@ -160,6 +160,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             localDiagonal[incoming[i - firstrow]]++;
         }
     }
+    MPI_Barrier(comm);
     if(output)
         printf("%i. Generated outlinks.\n", s);
     
