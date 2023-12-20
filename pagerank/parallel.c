@@ -156,13 +156,13 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         int incoming[size];
         for(int i = 0; i < size; i++)
             incoming[i] = -1;
-        printf("%i. There are %i incomign links.\n", s, size);
+        printf("%i. There are %i incoming links.\n", s, size);
         MPI_Irecv(incoming, size, MPI_INT, r, s, comm, &requests[p+r]);
         printf("%i. received\n", s);
         for(int i = 0; i < size; i++)
         {
             printf("%i. Incoming %i\n", s, incoming[i]);
-            localDiagonal[incoming[i - firstrow]]++;
+            localDiagonal[incoming[i] - firstrow]++;
         }
     }
     MPI_Barrier(comm);
