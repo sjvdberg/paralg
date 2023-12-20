@@ -201,7 +201,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     for(int r = 0; r < p; r++)
         if(r != s) 
-            MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+            MPI_Isend(&tempr[firstrow], numrows, MPI_FLOAT, r, r, comm, &requests[r]);
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
     {
@@ -269,11 +269,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         
         for(int r = 0; r < p; r++)
             if(r != s) 
-            {
-                float temp[numRows(N,p,r)];
                 MPI_Irecv(&tempr[firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
 
-            }
         MPI_Barrier(comm);
         //Computed tempr.
         for(int i = 0; i < numrows; i++)
