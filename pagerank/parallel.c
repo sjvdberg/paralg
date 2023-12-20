@@ -147,12 +147,12 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             offsets[i+1] = k;
     }
     
-    float Diagonal[N];
-    for(int i = 0; i < N; i++)
+    float Diagonal[numrows];
+    for(int i = 0; i < numrows; i++)
     {
         if(numOutlinks[i] == 0)
             numOutlinks[i] = 1;
-        Diagonal[i] = 1 / (float)numOutlinks[i];
+        Diagonal[i] = 1 / (float)numOutlinks[i + firstrow];
         if(output)
             printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
     }
@@ -197,7 +197,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < numrows; i++)
     {
         res[i] = 0;
-        tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
+        tempr[i + firstrow] = u[i] * Diagonal[i];
     }
     for(int r = 0; r < p; r++)
         if(r != s) 
@@ -253,7 +253,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         float newres[numrows];
         for(int i = 0; i  < numrows; i++)
         {
-            res[i] = res[i] * Diagonal[i+firstrow];
+            res[i] = res[i] * Diagonal[i];
             tempr[i + firstrow] = res[i];
             newres[i] = 0;
         }
