@@ -205,13 +205,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
     {
-        if(r != s) 
-        {
-            float tempu[numRows(N, p, r)];
-            MPI_Irecv(tempu, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
-            for(int i = 0; i < numRows(N, p, r); i++)
-                tempr[i + firstRow(N, p, r)] = tempu[i];
-        }
+        if(r != s)
+            MPI_Irecv(&tempr[firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
     }
     if(output)
         printf("%i Computed tempr\n", s);
