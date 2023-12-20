@@ -216,6 +216,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             tot += temptot;
         }
     }
+    MPI_Barrier(comm);
     for(int i = 0; i < numrows; i++)
         u[i] /=  (float)tot;
     if(output)
@@ -242,6 +243,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             MPI_Irecv(&tempr[firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
     if(output)
         printf("%i Computed tempr\n", s);
+    MPI_Barrier(comm);
     for(int i = 0; i < numrows; i++)
     {
         int nextOffset;
@@ -272,6 +274,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
             norm += temp;
         }
+    MPI_Barrier(comm);
     norm = sqrt(norm);
     if(output)
         printf("%i. Norm is %f\n", s, norm);
@@ -326,6 +329,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
                 norm += temp;
             }
+        MPI_Barrier(comm);
         norm = sqrt(norm);
         norms[t] = norm;
         if(output && t < 1)
