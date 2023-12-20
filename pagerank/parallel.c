@@ -24,6 +24,7 @@ int main(int argc, char **argv)
 
     for(int i = 10; i <= n; i *= 10)
     {
+        MPI_Barrier(MPI_COMM_WORLD);
         if(s == 0)
             printf("Computing n = %i.\n", i);
         computeVector(i, p, s, MPI_COMM_WORLD);
