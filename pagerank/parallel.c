@@ -145,6 +145,9 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         }
         if(i != numrows-1)
             offsets[i+1] = k;
+        else
+            if(k < numElements)
+                printf("%i. k should be %i, but is %i", s, numElements, k);
     }
     
     float Diagonal[N];
