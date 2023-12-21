@@ -226,7 +226,11 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         else
             nextOffset = offsets[i+1];
         for(int j = offsets[i]; j < nextOffset; j++) 
+        {
+            if(rows[j] > N)
+                printf("%i. Invalid j value %i", s, rows[j]);
             res[i] += tempr[rows[j]];
+        }
         res[i] = res[i] * prob;
         res[i] = 1 - (u[i] - res[i]);
     }
