@@ -184,7 +184,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             tot += temptot;
         }
     }
-    /*
+    
     for(int i = 0; i < numrows; i++)
         u[i] /=  (float)tot;
     if(output)
@@ -195,7 +195,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         norms[i] = -1;
     float prob = 0.85;
 
-    
+    /*
     for(int i = 0; i < numrows; i++)
     {
         res[i] = 0;
