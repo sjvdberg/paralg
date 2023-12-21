@@ -25,7 +25,8 @@ long main(long argc, char **argv)
     for(long i = 10; i <= n; i *= 10)
     {
         if(s == 0)
-            prlongf("Computing n = %i.\n", i);
+            print
+            f("Computing n = %i.\n", i);
         computeVector(i, p, s, MPI_COMM_WORLD);
     }
 
@@ -74,21 +75,25 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
             {
                 baseRows[i][l] = rand() % N;
                 if(output)
-                    prlongf(" %i ", baseRows[i][l]);
+                    print
+                    f(" %i ", baseRows[i][l]);
             }
             else
             {
                 if(output)
-                    prlongf("   ");
+                    print
+                    f("   ");
                 baseRows[i][l] = -1;
             }
         }
         baseRows[i][10] = -1;
         if(output)
-            prlongf("\n");
+            print
+            f("\n");
     }
     if(output)
-        prlongf("%i. Generated inlinks\n", s);
+        print
+        f("%i. Generated inlinks\n", s);
     long localDiagonal[N];
     for(long i = 0; i < N; i++)
         localDiagonal[i] = 0;
@@ -117,7 +122,8 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
             numOutlinks[i] += localDiagonal[i];
     }
     if(output)
-        prlongf("%i. Generated outlinks.\n", s);
+        print
+        f("%i. Generated outlinks.\n", s);
     
     long selfLinks = 0;
     for(long i = 0; i < numrows; i++)
@@ -127,13 +133,15 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
             selfLinks++;
             numElements++;
             if(baseRows[i][10] != -1)
-                prlongf("%i. invalid value %i at %i\n", s, baseRows[i][10], i);
+                print
+                f("%i. invalid value %i at %i\n", s, baseRows[i][10], i);
             baseRows[i][10] = i + firstrow;
             numOutlinks[i + firstrow] = 1;
         }
     }
     if(output)
-        prlongf("%i. Added additional selflinks.\n", s);
+        print
+        f("%i. Added additional selflinks.\n", s);
     long rows[numElements];
     long offsets[numrows];
     offsets[0] = 0;
@@ -152,9 +160,11 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
             offsets[i+1] = k;
         else
             if(k != numElements)
-                prlongf("%i. k should be %i, but is %i\n Selflinks = %i\n", s, numElements, k, selfLinks);
+                print
+                f("%i. k should be %i, but is %i\n Selflinks = %i\n", s, numElements, k, selfLinks);
     }
-    prlongf("%i. last row starts at %i\n", s, offsets[numrows-1]);
+    print
+    f("%i. last row starts at %i\n", s, offsets[numrows-1]);
     
     float Diagonal[N];
     for(long i = 0; i < N; i++)
@@ -163,10 +173,12 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
             numOutlinks[i] = 1;
         Diagonal[i] = 1 / (float)numOutlinks[i];
         if(output)
-            prlongf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
+            print
+            f("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
     }
     if(output)
-        prlongf("Computed stochastic row Matrix.\n");
+        print
+        f("Computed stochastic row Matrix.\n");
     float u[numrows], res[numrows], tempr[N];
     long tot = 0;
     
@@ -197,7 +209,8 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
     for(long i = 0; i < numrows; i++)
         u[i] /=  (float)tot;
     if(output)
-        prlongf("%i Computed own u\n", s);
+        print
+        f("%i Computed own u\n", s);
     long t = 0;
     float norms[1000];
     for(long i = 0; i < 1000; i++)
@@ -226,7 +239,8 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
     }
     
     if(output)
-        prlongf("%i Computed tempr\n", s);
+        print
+        f("%i Computed tempr\n", s);
     for(long i = 0; i < numrows; i++)
     {
         long nextOffset;
@@ -237,11 +251,14 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
         for(long j = offsets[i]; j < nextOffset; j++) 
         {
             if(j > numElements)
-                prlongf("%i. Invalid j = %i\n", s, j);
+                print
+                f("%i. Invalid j = %i\n", s, j);
             if(rows[j] > N)
             {
-                prlongf("%i. Invalid j value %i at position %i\n", s, rows[j], j);
-                prlongf("%i. N = %i\n", s, N);
+                print
+                f("%i. Invalid j value %i at position %i\n", s, rows[j], j);
+                print
+                f("%i. N = %i\n", s, N);
             }
             res[i] += tempr[rows[j]];
         }
@@ -249,7 +266,8 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
         res[i] = 1 - (u[i] - res[i]);
     }
     if(output)
-        prlongf("%i. Computed initial residual\n", s);
+        print
+        f("%i. Computed initial residual\n", s);
     /*
     float norm = 0;
     for(long i = 0; i < numrows; i++)
@@ -268,7 +286,8 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
         }
     norm = sqrt(norm);
     if(output)
-        prlongf("%i. Norm is %f\n", s, norm);
+        print
+        f("%i. Norm is %f\n", s, norm);
     startloop = clock();
     
     while(norm > 0.000001)
@@ -327,11 +346,13 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
         norm = sqrt(norm);
         norms[t] = norm;
         if(output)
-            prlongf("%i. Norm in step %i is %f\n", s, t, norm);
+            print
+            f("%i. Norm in step %i is %f\n", s, t, norm);
         t++;
         if(t > 1000)
         {
-            prlongf("%i. Loop break at t = %i. Norm is %f\n", s, t, norm);
+            print
+            f("%i. Loop break at t = %i. Norm is %f\n", s, t, norm);
         }
     }
     */
@@ -341,8 +362,11 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
         float tottime = ((float)(end - start)) / CLOCKS_PER_SEC;
         //float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
         //float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
-        prlongf("total time is %f\n", tottime);
-        //prlongf("initial time is %f\n", initialtime);
-        //prlongf("loop time is %f\n", looptime);
+        print
+        f("total time is %f\n", tottime);
+        //print
+        f("initial time is %f\n", initialtime);
+        //print
+        f("loop time is %f\n", looptime);
     }
 }
