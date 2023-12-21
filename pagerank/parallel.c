@@ -195,7 +195,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         norms[i] = -1;
     float prob = 0.85;
 
-    /*
+    
     for(int i = 0; i < numrows; i++)
     {
         res[i] = 0;
@@ -215,6 +215,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
         }
     }
+    /*
     if(output)
         printf("%i Computed tempr\n", s);
     for(int i = 0; i < numrows; i++)
