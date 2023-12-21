@@ -160,7 +160,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         printf("Computed stochastic row Matrix.\n");
     float u[numrows], res[numrows], tempr[N];
     int tot = 0;
-     /*
+    
 
     for(int i = 0; i < numrows; i++)
     {
@@ -184,6 +184,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             tot += temptot;
         }
     }
+    /*
     for(int i = 0; i < numrows; i++)
         u[i] /=  (float)tot;
     if(output)
