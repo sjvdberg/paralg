@@ -67,7 +67,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < numrows; i++)
     {
         int k = rand() % 10;
-        numElements += k;
+        numElements += k + 1;
         for(int l = 0; l < 11; l++)
         {
             if(l <= k)
