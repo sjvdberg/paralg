@@ -34,11 +34,11 @@ long main(long argc, char **argv)
 } /* end main */
 
 
-long numRows(long N, long p, long s)
+long numRows(long N, int p, int s)
 {
     return (N+p-s-1)/p;
 }
-long firstRow(long N, long p, long s)
+long firstRow(long N, int p, int s)
 {
     long numrows = numRows(N, p,s);
     long remainder = N % p;
@@ -55,7 +55,7 @@ long firstRow(long N, long p, long s)
 //n is number of rows/columns.
 //p is number of processors.
 //s is own rank.
-void computeVector(long N, long p, long s, MPI_Comm comm)
+void computeVector(long N, int p, int s, MPI_Comm comm)
 {
     clock_t start, startloop, end;
     start = clock();
