@@ -154,6 +154,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             if(k != numElements)
                 printf("%i. k should be %i, but is %i\n Selflinks = %i\n", s, numElements, k, selfLinks);
     }
+    printf("%i. last row starts at %i", s, offsets[numrows-1]);
     
     float Diagonal[N];
     for(int i = 0; i < N; i++)
