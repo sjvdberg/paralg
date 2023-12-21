@@ -126,6 +126,8 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         {
             selfLinks++;
             numElements++;
+            if(baseRows[i][10] != -1)
+                printf("%i. invalid value %i at %i\n", s, baseRows[i][10], i)
             baseRows[i][10] = i + firstrow;
             numOutlinks[i + firstrow] = 1;
         }
@@ -135,9 +137,9 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     int rows[numElements];
     int offsets[numrows];
     offsets[0] = 0;
-    int k = 0;
     for(int i = 0; i < numrows; i++)
     {
+        int k = offsets[i];
         for(int l = 0; l < 11; l++)
         {
             if(baseRows[i][l] != -1)
