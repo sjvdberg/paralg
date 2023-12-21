@@ -92,7 +92,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     }
     if(output)
         printf("%i. Generated inlinks\n", s);
-    long localDiagonal[N];
+    int localDiagonal[N];
     for(long i = 0; i < N; i++)
         localDiagonal[i] = 0;
     for(long i = 0; i < numrows; i++)
@@ -119,9 +119,10 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long r = 0; r < p; r++)
     {
         if(r == s) continue;
-        MPI_Irecv(localDiagonal, N, MPI_INT, r, s, comm, &requests[p+r]);
+        int temp[N];
+        MPI_Irecv(temp, N, MPI_INT, r, s, comm, &requests[p+r]);
         for(long i = 0; i < N; i++)
-            numOutlinks[i] += localDiagonal[i];
+            numOutlinks[i] += temp[i];
     }
     if(output)
         printf("%i. Generated outlinks.\n", s);
