@@ -229,7 +229,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     if(output)
         printf("%i. Computed initial residual\n", s);
-    
+   
     float norm = 0;
     for(int i = 0; i < numrows; i++)
         norm += res[i]*res[i];
@@ -249,6 +249,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     if(output)
         printf("%i. Norm is %f\n", s, norm);
     startloop = clock();
+     /*
     while(norm > 0.000001)
     {
         for(int i = 0; i < numrows; i++)
@@ -312,6 +313,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             printf("%i. Loop break at t = %i. Norm is %f\n", s, t, norm);
         }
     }
+    */
     end = clock();
     if(s == 0)
     {
