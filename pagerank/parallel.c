@@ -17,13 +17,14 @@ long main(int argc, char **argv)
     MPI_Comm_size(MPI_COMM_WORLD,&p); /* p = number of processors */ 
     MPI_Comm_rank(MPI_COMM_WORLD,&s); /* s = processor number */ 
 
-    long n=1000;
+    int n=1000;
     if (argc>1) n=atoi(argv[1]);
 
     if(n<0) MPI_Abort(MPI_COMM_WORLD,-1);
 
     for(int i = 10; i <= n; i *= 10)
     {
+        MPI_Barrier(MPI_COMM_WORLD);
         if(s == 0)
             printf("Computing n = %i.\n", i);
         computeVector(i, p, s, MPI_COMM_WORLD);
