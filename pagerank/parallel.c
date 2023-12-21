@@ -68,7 +68,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     {
         int k = rand() % 10;
         numElements += k + 1;
-        for(int l = 0; l < 11; l++)
+        for(int l = 0; l < 10; l++)
         {
             if(l <= k)
             {
@@ -83,6 +83,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 baseRows[i][l] = -1;
             }
         }
+        baseRows[i][10] = -1;
         if(output)
             printf("\n");
     }
