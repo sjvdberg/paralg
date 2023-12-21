@@ -7,7 +7,7 @@
 
 static bool output = false;
 
-long main(long argc, char **argv)
+long main(int argc, char **argv)
 {
     int p, s;
 
