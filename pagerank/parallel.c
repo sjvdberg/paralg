@@ -88,7 +88,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         if(output)
             printf("\n");
         if(baseRows[i][10] != -1)
-            printf("%i. invalid value %i at %i\n", s, baseRows[i][10], i);
+            printf("%i. early invalid value %i at %i\n", s, baseRows[i][10], i);
     }
     if(output)
         printf("%i. Generated inlinks\n", s);
