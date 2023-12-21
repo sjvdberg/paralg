@@ -125,7 +125,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         {
             selfLinks++;
             numElements++;
-            baseRows[i][10] = i;
+            baseRows[i][10] = i + firstrow;
             numOutlinks[i + firstrow] = 1;
         }
     }
