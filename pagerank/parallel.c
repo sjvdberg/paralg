@@ -9,7 +9,7 @@ static bool output = false;
 
 long main(long argc, char **argv)
 {
-    long p, s;
+    int p, s;
 
     /* SPMD part */
     MPI_Init(&argc,&argv);
@@ -22,7 +22,7 @@ long main(long argc, char **argv)
 
     if(n<0) MPI_Abort(MPI_COMM_WORLD,-1);
 
-    for(long i = 10; i <= n; i *= 10)
+    for(int i = 10; i <= n; i *= 10)
     {
         if(s == 0)
             printf("Computing n = %i.\n", i);
