@@ -160,6 +160,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         printf("Computed stochastic row Matrix.\n");
     float u[numrows], res[numrows], tempr[N];
     int tot = 0;
+     /*
 
     for(int i = 0; i < numrows; i++)
     {
@@ -249,7 +250,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     if(output)
         printf("%i. Norm is %f\n", s, norm);
     startloop = clock();
-     /*
+    
     while(norm > 0.000001)
     {
         for(int i = 0; i < numrows; i++)
@@ -318,10 +319,10 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     if(s == 0)
     {
         float tottime = ((float)(end - start)) / CLOCKS_PER_SEC;
-        float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
-        float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
+        //float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
+        //float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
         printf("total time is %f\n", tottime);
-        printf("initial time is %f\n", initialtime);
-        printf("loop time is %f\n", looptime);
+        //printf("initial time is %f\n", initialtime);
+        //printf("loop time is %f\n", looptime);
     }
 }
