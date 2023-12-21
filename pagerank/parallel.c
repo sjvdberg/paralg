@@ -215,7 +215,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
         }
     }
-    /*
+    
     if(output)
         printf("%i Computed tempr\n", s);
     for(int i = 0; i < numrows; i++)
@@ -232,7 +232,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     }
     if(output)
         printf("%i. Computed initial residual\n", s);
-   
+    /*
     float norm = 0;
     for(int i = 0; i < numrows; i++)
         norm += res[i]*res[i];
