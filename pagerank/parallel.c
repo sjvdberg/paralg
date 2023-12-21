@@ -118,7 +118,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     if(output)
         printf("%i. Generated outlinks.\n", s);
     
-    int i selfLinks = 0;
+    int selfLinks = 0;
     for(int i = 0; i < numrows; i++)
     {
         if(numOutlinks[i + firstrow] == 0)
