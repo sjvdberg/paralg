@@ -238,7 +238,10 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             if(j > numElements)
                 printf("%i. Invalid j = %i\n", s, j);
             if(rows[j] > N)
+            {
                 printf("%i. Invalid j value %i at position %i\n", s, rows[j], j);
+                printf("%i. N = %i\n", s, N);
+            }
             res[i] += tempr[rows[j]];
         }
         res[i] = res[i] * prob;
