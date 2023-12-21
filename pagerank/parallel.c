@@ -148,7 +148,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         if(i != numrows-1)
             offsets[i+1] = k;
         else
-            if(k < numElements)
+            if(k != numElements)
                 printf("%i. k should be %i, but is %i\n Selflinks = %i\n", s, numElements, k, selfLinks);
     }
     
@@ -233,7 +233,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         for(int j = offsets[i]; j < nextOffset; j++) 
         {
             if(j > numElements)
-                printf("%i. Invalid j = %i", s, j);
+                printf("%i. Invalid j = %i\n", s, j);
             if(rows[j] > N)
                 printf("%i. Invalid j value %i at position %i\n", s, rows[j], j);
             res[i] += tempr[rows[j]];
