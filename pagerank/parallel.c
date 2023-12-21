@@ -146,7 +146,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 k++;
             }
         }
-        if(i != numrows)
+        if(i + 1 != numrows)
             offsets[i+1] = k;
         else
             if(k != numElements)
