@@ -63,12 +63,14 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     int numrows = (N+p-s-1)/p ;
     int firstrow = firstRow(N, p, s);
     int baseRows[numrows][11];
+    int numElements = 0;
     for(int i = 0; i < numrows; i++)
     {
         int k = rand() % 10;
+        numElements += k;
         for(int l = 0; l < 11; l++)
         {
-            if(k <= l)
+            if(l <= k)
             {
                 baseRows[i][l] = rand() % N;
                 if(output)
@@ -87,14 +89,12 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     if(output)
         printf("%i. Generated inlinks\n", s);
     int localDiagonal[N];
-    int numElements = 0;
     for(int i = 0; i < N; i++)
         localDiagonal[i] = 0;
     for(int i = 0; i < numrows; i++)
         for(int l = 0; l < 11; l++)
             if(baseRows[i][l] != -1)
             {
-                numElements++;
                 localDiagonal[baseRows[i][l]]++;
             }
     int numOutlinks[N];
