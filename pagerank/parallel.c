@@ -68,7 +68,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         int k = rand() % 10;
         for(int l = 0; l < 11; l++)
         {
-            if(l <= k)
+            if(k <= l)
             {
                 baseRows[i][l] = rand() % N;
                 if(output)
