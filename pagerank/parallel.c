@@ -118,10 +118,12 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     if(output)
         printf("%i. Generated outlinks.\n", s);
     
+    int i selfLinks = 0;
     for(int i = 0; i < numrows; i++)
     {
         if(numOutlinks[i + firstrow] == 0)
         {
+            selfLinks++;
             numElements++;
             baseRows[i][10] = i;
             numOutlinks[i + firstrow] = 1;
@@ -147,7 +149,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             offsets[i+1] = k;
         else
             if(k < numElements)
-                printf("%i. k should be %i, but is %i", s, numElements, k);
+                printf("%i. k should be %i, but is %i\n Selflinks = %i\n", s, numElements, k, selfLinks);
     }
     
     float Diagonal[N];
