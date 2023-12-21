@@ -22,7 +22,7 @@ long main(int argc, char **argv)
 
     if(n<0) MPI_Abort(MPI_COMM_WORLD,-1);
 
-    for(int i = 10; i <= n; i *= 10)
+    for(long i = 10; i <= n; i *= 10)
     {
         MPI_Barrier(MPI_COMM_WORLD);
         if(s == 0)
@@ -87,6 +87,8 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         baseRows[i][10] = -1;
         if(output)
             printf("\n");
+        if(baseRows[i][10] != -1)
+            printf("%i. invalid value %i at %i\n", s, baseRows[i][10], i);
     }
     if(output)
         printf("%i. Generated inlinks\n", s);
