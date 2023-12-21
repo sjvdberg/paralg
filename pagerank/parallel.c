@@ -147,12 +147,12 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             offsets[i+1] = k;
     }
     
-    float Diagonal[numrows];
-    for(int i = 0; i < numrows; i++)
+    float Diagonal[N];
+    for(int i = 0; i < N; i++)
     {
         if(numOutlinks[i] == 0)
             numOutlinks[i] = 1;
-        Diagonal[i] = 1 / (float)numOutlinks[i + firstrow];
+        Diagonal[i] = 1 / (float)numOutlinks[i];
         if(output)
             printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
     }
@@ -197,16 +197,21 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < numrows; i++)
     {
         res[i] = 0;
-        tempr[i + firstrow] = u[i] * Diagonal[i];
+        tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
     }
     for(int r = 0; r < p; r++)
         if(r != s) 
-            MPI_Isend(&tempr[firstrow], numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+            MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
     MPI_Barrier(comm);
     for(int r = 0; r < p; r++)
     {
-        if(r != s)
-            MPI_Irecv(&tempr[firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
+        if(r != s) 
+        {
+            float tempu[numRows(N, p, r)];
+            MPI_Irecv(tempu, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
+            for(int i = 0; i < numRows(N, p, r); i++)
+                tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
+        }
     }
     if(output)
         printf("%i Computed tempr\n", s);
@@ -253,8 +258,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         float newres[numrows];
         for(int i = 0; i  < numrows; i++)
         {
-            res[i] = res[i] * Diagonal[i];
-            tempr[i + firstrow] = res[i];
+            tempr[i + firstrow] = res[i] * Diagonal[i+firstrow];
             newres[i] = 0;
         }
         for(int r = 0; r < p; r++)
@@ -264,8 +268,12 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         
         for(int r = 0; r < p; r++)
             if(r != s) 
-                MPI_Irecv(&tempr[firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
-
+            {
+                int temp[numRows(N,p,r)];
+                MPI_Irecv(temp, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
+                for(int i = 0; i < numRows(N,p,r); i++)
+                    tempr[i + firstRow(N, p, r)] = temp[i] * Diagonal[i + firstRow(N, p, r)];
+            }
         MPI_Barrier(comm);
         //Computed tempr.
         for(int i = 0; i < numrows; i++)
@@ -301,8 +309,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
         t++;
         if(t > 1000)
         {
-            printf("%i. Loop break at i = %i with norm %f\n", s, t, norm);
-            break;
+            printf("%i. Loop break at t = %i. Norm is %f\n", s, t, norm);
         }
     }
     end = clock();
