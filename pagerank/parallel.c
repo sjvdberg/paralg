@@ -96,6 +96,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long i = 0; i < N; i++)
         localDiagonal[i] = 0;
     for(long i = 0; i < numrows; i++)
+    {
         for(long l = 0; l < 11; l++)
             if(baseRows[i][l] != -1)
             {
@@ -103,6 +104,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             }
         if(baseRows[i][10] != -1)
             printf("%i. middle invalid value %i at %i\n", s, baseRows[i][10], i);
+    }
     long numOutlinks[N];
     MPI_Request requests[2*p];
     for(long r = 0; r < p; r++)
