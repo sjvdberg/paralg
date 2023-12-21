@@ -106,13 +106,13 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
             for(long i = 0; i < N; i++)
                 numOutlinks[i] = localDiagonal[i];
         else
-            MPI_Isend(localDiagonal, N, MPI_long, r, r, comm, &requests[r]);
+            MPI_Isend(localDiagonal, N, MPI_INT, r, r, comm, &requests[r]);
     }
     MPI_Barrier(comm);
     for(long r = 0; r < p; r++)
     {
         if(r == s) continue;
-        MPI_Irecv(localDiagonal, N, MPI_long, r, s, comm, &requests[p+r]);
+        MPI_Irecv(localDiagonal, N, MPI_INT, r, s, comm, &requests[p+r]);
         for(long i = 0; i < N; i++)
             numOutlinks[i] += localDiagonal[i];
     }
@@ -180,7 +180,7 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
     for(long r = 0; r < p; r++)
     {
         if(r != s)
-            MPI_Isend(&tot, 1, MPI_long, r, r, comm, &requests[r]);
+            MPI_Isend(&tot, 1, MPI_INT, r, r, comm, &requests[r]);
     }
     MPI_Barrier(comm);
 
@@ -189,7 +189,7 @@ void computeVector(long N, long p, long s, MPI_Comm comm)
         if(r != s)
         {
             long temptot;
-            MPI_Irecv(&temptot, 1, MPI_long, r, s, comm, &requests[p+r]);
+            MPI_Irecv(&temptot, 1, MPI_INT, r, s, comm, &requests[p+r]);
             tot += temptot;
         }
     }
