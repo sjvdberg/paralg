@@ -271,7 +271,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
     norm = 0;
     for(int r = 0; r < p; r++)
-        norm += locnorms[r]
+        norm += locnorms[r];
     
     norm = sqrt(norm);
     if(output)
