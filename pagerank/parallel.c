@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static bool output = true;
+static bool output = false;
 
 long main(int argc, char **argv)
 {
@@ -331,7 +331,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         for(int r = 0; r < p; r++)
         {
             for(long i = 0; i < numRows(N,p,r); i++)
-                    tempr[i + firstRow(N, p, r)] = tempu[i + r * numRows(N,p,r)];
+                    tempr[i + firstRow(N, p, r)] = tempu[i + r * numRows(N,p,0)];
         }
         //Computed tempr.
         for(long i = 0; i < numrows; i++)
