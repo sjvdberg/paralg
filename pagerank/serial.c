@@ -8,7 +8,7 @@ static bool output = false;
 void main()
 {
     int N = 10000000;
-    for(int i = 10; i < N; i *= 10)
+    for(int i = 10; i <= N; i *= 10)
         Serial(i);
 }
 
