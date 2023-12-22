@@ -201,7 +201,9 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             tot += temptot;
         }
     }
-    
+    for(long i = 0; i < numElements; i++)
+        if(rows[i] > N)
+            printf("%i. Rows[%ld] value is %ld", s, i, rows[i]);
     for(long i = 0; i < numrows; i++)
         u[i] /=  (float)tot;
     if(output)
