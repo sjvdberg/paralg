@@ -267,7 +267,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     }
     if(output)
         printf("%i. Computed initial residual\n", s);
-    /*
+    
     float norm = 0;
     for(long i = 0; i < numrows; i++)
         norm += res[i]*res[i];
@@ -351,15 +351,15 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             printf("%i. Loop break at t = %i. Norm is %f\n", s, t, norm);
         }
     }
-    */
+    
     end = clock();
     if(s == 0)
     {
         float tottime = ((float)(end - start)) / CLOCKS_PER_SEC;
-        //float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
-        //float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
+        float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
+        float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
         printf("total time is %f\n", tottime);
-        //printf("initial time is %f\n", initialtime);
-        //printf("loop time is %f\n", looptime);
+        printf("initial time is %f\n", initialtime);
+        printf("loop time is %f\n", looptime);
     }
 }
