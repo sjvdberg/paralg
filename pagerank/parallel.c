@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static bool output = true;
+static bool output = false;
 
 long main(int argc, char **argv)
 {
