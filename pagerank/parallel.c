@@ -105,18 +105,17 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         if(baseRows[i][10] != -1)
             printf("%i. middle invalid value %ld at %ld\n", s, baseRows[i][10], i);
     }
-    long numOutlinks[N];
+    long temp[p*N];
+    
     MPI_Request requests[2*p];
-    MPI_Status status[p];
     for(long r = 0; r < p; r++)
     {
-        if(r == s)
-            for(long i = 0; i < N; i++)
-                numOutlinks[i] = localDiagonal[i];
-        else
-            MPI_Send(localDiagonal, N, MPI_LONG, r, r, comm);
+        
+        MPI_Isend(localDiagonal, N, MPI_LONG, r, r, comm, &requests[r]);
+        MPI_Irecv(temp + r*N, N, MPI_LONG, r, s, comm, &requests[p+r]);
     }
-    MPI_Barrier(comm);
+    MPI_Waitall(2*np, requests,MPI_STATUSES_IGNORE)
+    /*
     for(long r = 0; r < p; r++)
     {
         if(r == s) continue;
@@ -124,6 +123,14 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         MPI_Recv(temp, N, MPI_LONG, r, s, comm, &status[r]);
         for(long i = 0; i < N; i++)
             numOutlinks[i] += temp[i];
+    }
+    */
+    long[N] numOutlinks;
+    for(int i = 0; i < N; i++)
+    {
+        numOutlinks[i] = 0;
+        for(int r = 0; r < p; r++)
+            numOutlinks[i] += temp[N*p+i];
     }
     if(output)
         printf("%i. Generated outlinks.\n", s);
@@ -165,8 +172,6 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             if(k != numElements)
                 printf("%i. k should be %ld, but is %ld\n Selflinks = %ld\n", s, numElements, k, selfLinks);
     }
-    printf("%i. last row starts at %ld\n", s, offsets[numrows-1]);
-    
     float Diagonal[N];
     for(long i = 0; i < N; i++)
     {
@@ -193,12 +198,15 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             printf("%i. OLD Rows[%ld] value is %ld\n", s, i, rows[i]);
     
     MPI_Barrier(comm);
+    
+    int tmp[p];
     for(long r = 0; r < p; r++)
     {
-        if(r != s)
-            MPI_Send(&tot, 1, MPI_INT, r, r, comm);
+        MPI_Isend(&tot, 1, MPI_INT, r, r, comm, &requests[r]);
+        MPI_Irecv(&temptot, 1, MPI_INT, r, s, comm, &requests[p+r]);
     }
-    MPI_Barrier(comm);
+    MPI_Waitall(2*np, requests,MPI_STATUSES_IGNORE)
+    /*
     for(long r = 0; r < p; r++)
     {
         if(r != s)
@@ -208,6 +216,10 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             tot += temptot;
         }
     }
+    */
+    tot = 0;
+    for(int r = 0; r < p; r++)
+        tot += tmp[r];
     for(long i = 0; i < numElements; i++)
         if(rows[i] > N)
             printf("%i. Rows[%ld] value is %ld\n", s, i, rows[i]);
@@ -271,10 +283,13 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     float norm = 0;
     for(long i = 0; i < numrows; i++)
         norm += res[i]*res[i];
-
+    /*
     for(long r = 0; r < p; r++)
-        if(r != s)
-            MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
+    {
+        MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
+        MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
+    }
+    /*
     MPI_Barrier(comm);
     for(long r = 0; r < p; r++)
         if(r != s)
@@ -283,6 +298,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
             norm += temp;
         }
+    */
     norm = sqrt(norm);
     if(output)
         printf("%i. Norm is %f\n", s, norm);
@@ -351,15 +367,15 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             printf("%i. Loop break at t = %i. Norm is %f\n", s, t, norm);
         }
     }
-    
+    */
     end = clock();
     if(s == 0)
     {
         float tottime = ((float)(end - start)) / CLOCKS_PER_SEC;
-        float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
-        float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
+        //float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
+        //float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
         printf("total time is %f\n", tottime);
-        printf("initial time is %f\n", initialtime);
-        printf("loop time is %f\n", looptime);
+        //printf("initial time is %f\n", initialtime);
+        //printf("loop time is %f\n", looptime);
     }
 }
