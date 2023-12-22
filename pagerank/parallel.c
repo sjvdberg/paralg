@@ -187,13 +187,14 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long i = 0; i < numrows; i++)
     {
         int k = rand() % 1000;
-        u[i] = k * (float)tot / (float)loctot;
+        u[i] = k * (float)tot;
         loctot += k;
     }
+    MPI_Request req[2*p];
     for(long r = 0; r < p; r++)
     {
         if(r != s)
-            MPI_Isend(&tot, 1, MPI_INT, r, r, comm, &requests[r]);
+            MPI_Isend(&tot, 1, MPI_INT, r, r, comm, &req[r]);
     }
     MPI_Barrier(comm);
 
@@ -202,7 +203,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         if(r != s)
         {
             int temptot;
-            MPI_Irecv(&temptot, 1, MPI_INT, r, s, comm, &requests[p+r]);
+            MPI_Irecv(&temptot, 1, MPI_INT, r, s, comm, &req[p+r]);
             tot += temptot;
         }
     }
@@ -211,7 +212,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             printf("%i. Rows[%ld] value is %ld\n", s, i, rows[i]);
     
     for(long i = 0; i < numrows; i++)
-        u[i] /=  (float)tot;
+        u[i] = u[i] / (float)tot /(float)loctot;
     if(output)
         printf("%i Computed own u\n", s);
     long t = 0;
