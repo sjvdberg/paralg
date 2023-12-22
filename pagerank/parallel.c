@@ -201,7 +201,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     {
         if(r != s)
         {
-            long temptot;
+            int temptot;
             MPI_Irecv(&temptot, 1, MPI_INT, r, s, comm, &requests[p+r]);
             tot += temptot;
         }
