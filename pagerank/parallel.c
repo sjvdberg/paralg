@@ -320,12 +320,14 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         for(long i = 0; i < numrows; i++)
             norm += res[i]*res[i];
         for(long r = 0; r < p; r++)
+        {
             MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
-            MPI_Irecv(&locnorms + r, 1, MPI_FLOAT, r, s, comm, &requests[p + r]);
+            MPI_Irecv(locnorms + r, 1, MPI_FLOAT, r, s, comm, &requests[p + r]);
+        }
         MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
         norm = 0;
         for(long r = 0; r < p; r++)
-            norm += locnorms[r]
+            norm += locnorms[r];
         norm = sqrt(norm);
         norms[t] = norm;
         if(output)
