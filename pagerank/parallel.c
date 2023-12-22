@@ -145,7 +145,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     long incoming[p*maxsize];
     printf("%ld", outOffsets[s]);
     for(long i = 0; i < numElements; i++)
-        printf("Element %ld\n", outgoingLinks[i];)
+        printf("Element %ld\n", outgoingLinks[i]);
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(outgoingLinks + outOffsets[r], outgoingDiagonal[r], MPI_INT, r, r, comm, &requests[r]);
