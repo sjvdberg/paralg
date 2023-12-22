@@ -107,20 +107,21 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     }
     long numOutlinks[N];
     MPI_Request requests[2*p];
+    MPI_Status status[p];
     for(long r = 0; r < p; r++)
     {
         if(r == s)
             for(long i = 0; i < N; i++)
                 numOutlinks[i] = localDiagonal[i];
         else
-            MPI_Isend(localDiagonal, N, MPI_INT, r, r, comm, &requests[r]);
+            MPI_Send(localDiagonal, N, MPI_INT, r, r, comm);
     }
     MPI_Barrier(comm);
     for(long r = 0; r < p; r++)
     {
         if(r == s) continue;
         int temp[N];
-        MPI_Irecv(temp, N, MPI_INT, r, s, comm, &requests[p+r]);
+        MPI_Recv(temp, N, MPI_INT, r, s, comm, &status[r]);
         for(long i = 0; i < N; i++)
             numOutlinks[i] += temp[i];
     }
@@ -192,7 +193,6 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             printf("%i. OLD Rows[%ld] value is %ld\n", s, i, rows[i]);
     
     MPI_Barrier(comm);
-    MPI_Status status[p];
     for(long r = 0; r < p; r++)
     {
         if(r != s)
