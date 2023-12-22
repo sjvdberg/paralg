@@ -178,7 +178,8 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     if(output)
         printf("Computed stochastic row Matrix.\n");
     float u[numrows], res[numrows], tempr[N];
-    long tot = 0;
+    int tot = rand % 1000;
+    long loctot = 0;
     
     for(long i = 0; i < numElements; i++)
         if(rows[i] > N)
@@ -186,10 +187,25 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long i = 0; i < numrows; i++)
     {
         int k = rand() % 1000;
-        u[i] = k;
-        tot += k;
+        u[i] = k * (float)tot / (float)loctot;
+        loctot += k;
     }
-    
+    for(long r = 0; r < p; r++)
+    {
+        if(r != s)
+            MPI_Isend(&tot, 1, MPI_INT, r, r, comm, &requests[r]);
+    }
+    MPI_Barrier(comm);
+
+    for(long r = 0; r < p; r++)
+    {
+        if(r != s)
+        {
+            long temptot;
+            MPI_Irecv(&temptot, 1, MPI_INT, r, s, comm, &requests[p+r]);
+            tot += temptot;
+        }
+    }
     for(long i = 0; i < numElements; i++)
         if(rows[i] > N)
             printf("%i. Rows[%ld] value is %ld\n", s, i, rows[i]);
