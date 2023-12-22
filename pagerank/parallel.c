@@ -195,7 +195,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long r = 0; r < p; r++)
     {
         if(r != s)
-            MPI_Isend(&tot, 1, MPI_INT, r, r, comm, &req[r]);
+            MPI_Send(&tot, 1, MPI_INT, r, r, comm, &req[r]);
     }
     MPI_Barrier(comm);
 
@@ -204,7 +204,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         if(r != s)
         {
             int temptot;
-            MPI_Irecv(&temptot, 1, MPI_INT, r, s, comm, &req[p+r]);
+            MPI_Recv(&temptot, 1, MPI_INT, r, s, comm, &req[p+r]);
             tot += temptot;
         }
     }
