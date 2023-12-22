@@ -105,9 +105,6 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     if(output)
         printf("%i. Generated inlinks\n", s);
     long outgoingDiagonal[p];
-    long numElements = 0;
-    for(long i = 0; i < numrows; i++)
-        localDiagonal[i] = 0;
     for(int r = 0; r < p; r++)
         outgoingDiagonal[r] = 0;
     for(long i = 0; i < numrows; i++)
