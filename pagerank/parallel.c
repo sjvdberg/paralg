@@ -180,7 +180,9 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     float u[numrows], res[numrows], tempr[N];
     long tot = 0;
     
-    
+    for(long i = 0; i < numElements; i++)
+        if(rows[i] > N)
+            printf("%i. OLD Rows[%ld] value is %ld\n", s, i, rows[i]);
     for(long i = 0; i < numrows; i++)
     {
         long k = rand() % (N*1000);
@@ -203,6 +205,10 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             tot += temptot;
         }
     }
+    for(long i = 0; i < numElements; i++)
+        if(rows[i] > N)
+            printf("%i. Rows[%ld] value is %ld\n", s, i, rows[i]);
+    
     for(long i = 0; i < numrows; i++)
         u[i] /=  (float)tot;
     if(output)
@@ -213,10 +219,6 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         norms[i] = -1;
     float prob = 0.85;
 
-    for(long i = 0; i < numElements; i++)
-        if(rows[i] > N)
-            printf("%i. Rows[%ld] value is %ld\n", s, i, rows[i]);
-    
     for(long i = 0; i < numrows; i++)
     {
         res[i] = 0;
