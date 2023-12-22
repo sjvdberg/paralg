@@ -336,6 +336,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         if(t > 1000)
         {
             printf("%i. Loop break at t = %i. Norm is %f\n", s, t, norm);
+            break;
         }
     }
     
