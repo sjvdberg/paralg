@@ -62,7 +62,7 @@ int pLoc(int N, int p, int j)
     if(j < remainder * (numrows + 1))
         return j / (numrows + 1);
     else
-        return j / numrows - remainder;
+        return remainder + (j - remainder*(numrows + 1)) / numrows;
 }
 
 //n is number of rows/columns.
