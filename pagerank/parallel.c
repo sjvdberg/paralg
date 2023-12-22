@@ -27,6 +27,8 @@ long main(int argc, char **argv)
         MPI_Barrier(MPI_COMM_WORLD);
         if(s == 0)
             printf("Computing n = %i.\n", i);
+        if(i * 10 > n)
+            i = n;
         computeVector(i, p, s, MPI_COMM_WORLD);
     }
 
@@ -203,7 +205,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             numOutlinks[i] = 1;
         Diagonal[i] = 1 / (float)numOutlinks[i];
         if(output)
-            printf("%i. Diagonal at %ld is %f\n", s, i, Diagonal[i]);
+            printf("%i. Diagonal at %ld is %f\n", s, i + firstrow, Diagonal[i]);
     }
     if(output)
         printf("Computed stochastic row Matrix.\n");
