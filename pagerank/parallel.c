@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static bool output = false;
+static bool output = true;
 
 long main(int argc, char **argv)
 {
@@ -140,7 +140,6 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         if(maxsize < sizes[r])
             maxsize = sizes[r];
     long incoming[p*maxsize];
-    printf("%ld", outOffsets[s]);
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(outgoingLinks + outOffsets[r], outgoingDiagonal[r], MPI_LONG, r, r, comm, &requests[r]);
@@ -155,40 +154,8 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long r = 0; r < p; r++)
         for(long i = 0; i < sizes[r]; i++)
         {
-            if(incoming[i + maxsize * r] > N)
-                printf("%i. Incoming value %ld at %ld\n", s, incoming[i + maxsize * r], i);
             numOutlinks[incoming[i + maxsize * r] - firstrow]++;
         }
-    /*
-    for(long i = 0; i < N; i++)
-        localDiagonal[i] = 0;
-    for(long i = 0; i < numrows; i++)
-    {
-        for(long l = 0; l < 11; l++)
-            if(baseRows[i][l] != -1)
-                localDiagonal[baseRows[i][l]]++;
-        if(baseRows[i][10] != -1)
-            printf("%i. middle invalid value %ld at %ld\n", s, baseRows[i][10], i);
-    }
-    int temp[p*N];
-    
-    
-    for(long r = 0; r < p; r++)
-    {
-        MPI_Isend(localDiagonal, N, MPI_INT, r, r, comm, &requests[r]);
-        MPI_Irecv(temp + r*N, N, MPI_INT, r, s, comm, &requests[p+r]);
-    }
-    MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
-    
-    long numOutlinks[N];
-    for(int i = 0; i < N; i++)
-    {
-        numOutlinks[i] = 0;
-        
-        for(int r = 0; r < p; r++)
-            numOutlinks[i] += temp[N*r+i];
-    }
-    */
     if(output)
         printf("%i. Generated outlinks.\n", s);
     
