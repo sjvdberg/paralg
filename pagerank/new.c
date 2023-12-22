@@ -303,6 +303,7 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
                 MPI_Irecv(&tempr[firstRow(N, p, r)], numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
 
         MPI_Barrier(comm);
+        /*
         //Computed tempr.
         for(int i = 0; i < numrows; i++)
         {
@@ -342,15 +343,16 @@ void computeVector(int N, int p, int s, MPI_Comm comm)
             break;
         }
     }
+    */
     end = clock();
     if(s == 0)
     {
         printf("Finished in %i steps.\n", t);
         float tottime = ((float)(end - start)) / CLOCKS_PER_SEC;
-        float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
-        float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
+        //float initialtime = ((float)(startloop - start)) / CLOCKS_PER_SEC;
+        //float looptime = ((float)(end - startloop)) / CLOCKS_PER_SEC;
         printf("total time is %f\n", tottime);
-        printf("initial time is %f\n", initialtime);
-        printf("loop time is %f\n", looptime);
+        //printf("initial time is %f\n", initialtime);
+        //printf("loop time is %f\n", looptime);
     }
 }
