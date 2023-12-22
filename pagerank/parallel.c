@@ -203,7 +203,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(&tot, 1, MPI_INT, r, r, comm, &requests[r]);
-        MPI_Irecv(&temptot, 1, MPI_INT, r, s, comm, &requests[p+r]);
+        MPI_Irecv(&tmp, 1, MPI_INT, r, s, comm, &requests[p+r]);
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
     /*
