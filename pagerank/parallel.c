@@ -143,9 +143,6 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         if(maxsize < sizes[r])
             maxsize = sizes[r];
     long incoming[p*maxsize];
-    for(int r = 0; r < p; r++)
-        for(int j = 0; j < numElements; j++)
-            printf("element %ld\n", outgoingLinks[j]);
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(outgoingLinks + outOffsets[r], outgoingDiagonal[r], MPI_INT, r, r, comm, &requests[r]);
@@ -161,7 +158,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         for(long i = 0; i < sizes[r]; i++)
         {
             if(incoming[i + maxsize * r] > N)
-                printf("%i. Incoming value %ld", s, incoming[i + maxsize * r]);
+                printf("%i. Incoming value %ld at %ld\n", s, incoming[i + maxsize * r], i);
             numOutlinks[incoming[i + maxsize * r] - firstrow]++;
         }
     /*
