@@ -131,8 +131,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
                     tempOffsets[pLoc(N, p, j)]++;
                 }
             }
-    if(output)
-        printf("%i. Sent across sizes");
+    
     long sizes[p];
     for(long r = 0; r < p; r++)
     {
@@ -140,6 +139,8 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         MPI_Irecv(sizes + r, 1, MPI_LONG, r, s, comm, &requests[p+r]);
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
+    if(output)
+        printf("%i. Sent across sizes\n", s);
     long maxsize = 0;
     for(int r = 0; r < p; r++)
         if(maxsize < sizes[r])
