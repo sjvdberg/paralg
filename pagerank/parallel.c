@@ -292,21 +292,15 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     if(output)
         printf("%i. Computed initial residual\n", s);
     
-    float norm = 0;
+    float locnorm = 0;
+    float globnorm;
     for(long i = 0; i < numrows; i++)
-        norm += res[i]*res[i];
+        locnorm += res[i]*res[i];
     float locnorms[p];
-    for(long r = 0; r < p; r++)
-    {
-        MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
-        MPI_Irecv(locnorms + r, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
-    }
-    MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
-    norm = 0;
-    for(int r = 0; r < p; r++)
-        norm += locnorms[r];
+    MPI_Allreduce(&locnorm, &globnorm, 1, MPI_FLOAT, MPI_SUM, comm);
+
     
-    norm = sqrt(norm);
+    float norm = sqrt(globnorm);
     if(output)
         printf("%i. Norm is %f\n", s, norm);
     startloop = clock();
@@ -350,20 +344,12 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         }
         //Computed r.
         norm = 0;
-        for(long r = 0; r < p; r++)
-            locnorms[r] = 0; 
+        locnorm = 0;
         for(long i = 0; i < numrows; i++)
-            norm += res[i]*res[i];
-        for(long r = 0; r < p; r++)
-        {
-            MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
-            MPI_Irecv(locnorms + r, 1, MPI_FLOAT, r, s, comm, &requests[p + r]);
-        }
-        MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
-        norm = 0;
-        for(long r = 0; r < p; r++)
-            norm += locnorms[r];
-        norm = sqrt(norm);
+            locnorm += res[i]*res[i];
+        MPI_Allreduce(&locnorm, &globnorm, 1, MPI_FLOAT, MPI_SUM, comm);
+
+        norm = sqrt(globnorm);
         norms[t] = norm;
         if(output && t < 5)
             printf("%i. Norm in step %i is %f\n", s, t, norm);
