@@ -3,10 +3,16 @@
 #include <math.h>
 #include <time.h>
 
-static long N = 10000; 
 static bool output = false;
 
 void main()
+{
+    int N = 10000000;
+    for(int i = 10; i < N; i *= 10)
+        Serial(N);
+}
+
+void Serial(long N)
 {
     clock_t start = clock();
     printf("N = %i\n", N);
