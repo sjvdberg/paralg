@@ -131,6 +131,8 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
                     tempOffsets[pLoc(N, p, j)]++;
                 }
             }
+    if(output)
+        printf("%i. Sent across sizes");
     long sizes[p];
     for(long r = 0; r < p; r++)
     {
