@@ -159,7 +159,11 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         numOutlinks[i] = 0;
     for(long r = 0; r < p; r++)
         for(long i = 0; i < sizes[r]; i++)
+        {
+            if(incoming[i + maxsize * r] > N)
+                printf("%i. Incoming value %ld", s, incoming[i + maxsize * r]);
             numOutlinks[incoming[i + maxsize * r] - firstrow]++;
+        }
     /*
     for(long i = 0; i < N; i++)
         localDiagonal[i] = 0;
