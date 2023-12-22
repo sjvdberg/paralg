@@ -106,8 +106,9 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             printf("%i. middle invalid value %ld at %ld\n", s, baseRows[i][10], i);
     }
     long temp[p*N];
-    /*
+    
     MPI_Request requests[2*p];
+    /*
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(localDiagonal, N, MPI_LONG, r, r, comm, &requests[r]);
