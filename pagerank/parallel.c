@@ -114,14 +114,14 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             for(long i = 0; i < N; i++)
                 numOutlinks[i] = localDiagonal[i];
         else
-            MPI_Send(localDiagonal, N, MPI_INT, r, r, comm);
+            MPI_Send(localDiagonal, N, MPI_LONG, r, r, comm);
     }
     MPI_Barrier(comm);
     for(long r = 0; r < p; r++)
     {
         if(r == s) continue;
         int temp[N];
-        MPI_Recv(temp, N, MPI_INT, r, s, comm, &status[r]);
+        MPI_Recv(temp, N, MPI_LONG, r, s, comm, &status[r]);
         for(long i = 0; i < N; i++)
             numOutlinks[i] += temp[i];
     }
