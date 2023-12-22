@@ -119,10 +119,10 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(int i = 0; i < N; i++)
     {
         numOutlinks[i] = 0;
-        /*
+        
         for(int r = 0; r < p; r++)
             numOutlinks[i] += temp[N*p+i];
-            */
+            
     }
     if(output)
         printf("%i. Generated outlinks.\n", s);
