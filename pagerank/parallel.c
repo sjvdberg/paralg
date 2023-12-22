@@ -75,7 +75,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             {
                 baseRows[i][l] = rand() % N;
                 if(output)
-                    printf(" %i ", baseRows[i][l]);
+                    printf(" %ld ", baseRows[i][l]);
             }
             else
             {
@@ -88,7 +88,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         if(output)
             printf("\n");
         if(baseRows[i][10] != -1)
-            printf("%i. early invalid value %i at %i\n", s, baseRows[i][10], i);
+            printf("%i. early invalid value %ld at %ld\n", s, baseRows[i][10], i);
     }
     if(output)
         printf("%i. Generated inlinks\n", s);
@@ -103,7 +103,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
                 localDiagonal[baseRows[i][l]]++;
             }
         if(baseRows[i][10] != -1)
-            printf("%i. middle invalid value %i at %i\n", s, baseRows[i][10], i);
+            printf("%i. middle invalid value %ld at %ld\n", s, baseRows[i][10], i);
     }
     long numOutlinks[N];
     MPI_Request requests[2*p];
@@ -131,7 +131,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long i = 0; i < numrows; i++)
     {
         if(baseRows[i][10] != -1)
-            printf("%i. invalid value %i at %i\n", s, baseRows[i][10], i);
+            printf("%i. invalid value %ld at %ld\n", s, baseRows[i][10], i);
         if(numOutlinks[i + firstrow] == 0)
         {
             selfLinks++;
@@ -160,9 +160,9 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             offsets[i+1] = k;
         else
             if(k != numElements)
-                printf("%i. k should be %i, but is %i\n Selflinks = %i\n", s, numElements, k, selfLinks);
+                printf("%i. k should be %ld, but is %ld\n Selflinks = %ld\n", s, numElements, k, selfLinks);
     }
-    printf("%i. last row starts at %i\n", s, offsets[numrows-1]);
+    printf("%i. last row starts at %ld\n", s, offsets[numrows-1]);
     
     float Diagonal[N];
     for(long i = 0; i < N; i++)
@@ -171,7 +171,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             numOutlinks[i] = 1;
         Diagonal[i] = 1 / (float)numOutlinks[i];
         if(output)
-            printf("%i. Diagonal at %i is %f\n", s, i, Diagonal[i]);
+            printf("%i. Diagonal at %ld is %f\n", s, i, Diagonal[i]);
     }
     if(output)
         printf("Computed stochastic row Matrix.\n");
@@ -245,11 +245,11 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         for(long j = offsets[i]; j < nextOffset; j++) 
         {
             if(j > numElements)
-                printf("%i. Invalid j = %i\n", s, j);
+                printf("%i. Invalid j = %ld\n", s, j);
             if(rows[j] > N)
             {
-                printf("%i. Invalid j value %i at position %i\n", s, rows[j], j);
-                printf("%i. N = %i\n", s, N);
+                printf("%i. Invalid rows value %ld at position %ld\n", s, rows[j], j);
+                printf("%i. N = %ld\n", s, N);
             }
             res[i] += tempr[rows[j]];
         }
