@@ -214,24 +214,24 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long i = 0; i < 1000; i++)
         norms[i] = -1;
     float prob = 0.85;
+    float newres[numrows];
 
     for(long i = 0; i < numrows; i++)
     {
         res[i] = 0;
-        tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
+        newres[i] = u[i] * Diagonal[i + firstrow];
     }
     float tempu[p * numRows(N,p,0)];
     for(long r = 0; r < p; r++)
     {
-        MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+        MPI_Isend(newres, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
         MPI_Irecv(tempu + r * numRows(N,p,0), numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
     for(int r = 0; r < p; r++)
-    {
         for(long i = 0; i < numRows(N, p, r); i++)
-            tempr[i + firstRow(N, p, r)] = tempu[i + r * numRows(N, p, 0)] * Diagonal[i + firstRow(N, p, r)];   
-    }
+            tempr[i + firstRow(N, p, r)] = tempu[i + r * numRows(N, p, 0)]; 
+
     if(output)
         printf("%i Computed tempr\n", s);
     for(long i = 0; i < numrows; i++)
@@ -283,7 +283,6 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             u[i] += res[i];
 
         //Computed u.
-        float newres[numrows];
         for(long i = 0; i  < numrows; i++)
         {
             res[i] = res[i] * Diagonal[i+firstrow];
