@@ -124,12 +124,8 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         for(int l = 0; l < 10; l++)
             if(baseRows[i][l] != -1)
             {
-                int j = baseRows[i][l];
-                if(j < firstrow || j > lastrow)
-                {
-                    outgoingLinks[tempOffsets[pLoc(N, p, j)]] = j;
-                    tempOffsets[pLoc(N, p, j)]++;
-                }
+                outgoingLinks[tempOffsets[pLoc(N, p, j)]] = j;
+                tempOffsets[pLoc(N, p, j)]++;
             }
     
     long sizes[p];
