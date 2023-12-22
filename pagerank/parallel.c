@@ -199,17 +199,6 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         MPI_Irecv(&tmp, 1, MPI_INT, r, s, comm, &requests[p+r]);
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
-    /*
-    for(long r = 0; r < p; r++)
-    {
-        if(r != s)
-        {
-            int temptot;
-            MPI_Recv(&temptot, 1, MPI_INT, r, s, comm, &status[r]);
-            tot += temptot;
-        }
-    }
-    */
     tot = 0;
     for(int r = 0; r < p; r++)
         tot += tmp[r];
@@ -276,7 +265,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     float norm = 0;
     for(long i = 0; i < numrows; i++)
         norm += res[i]*res[i];
-    /*
+    
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
@@ -360,7 +349,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             printf("%i. Loop break at t = %i. Norm is %f\n", s, t, norm);
         }
     }
-    */
+    
     end = clock();
     if(s == 0)
     {
