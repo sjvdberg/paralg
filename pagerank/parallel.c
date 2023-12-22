@@ -302,14 +302,14 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         }
         for(long r = 0; r < p; r++)
             if(r != s) 
-                MPI_Isend(res, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+                MPI_Send(res, numrows, MPI_FLOAT, r, r, comm);
         MPI_Barrier(comm);
         
         for(long r = 0; r < p; r++)
             if(r != s) 
             {
                 float temp[numRows(N,p,r)];
-                MPI_Irecv(temp, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
+                MPI_Recv(temp, numRows(N, p, r), MPI_FLOAT, r, s, comm, &status[r]);
                 for(long i = 0; i < numRows(N,p,r); i++)
                     tempr[i + firstRow(N, p, r)] = temp[i] * Diagonal[i + firstRow(N, p, r)];
             }
@@ -332,13 +332,13 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             norm += res[i]*res[i];
         for(long r = 0; r < p; r++)
             if(r != s)
-                MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
+                MPI_Send(&norm, 1, MPI_FLOAT, r, r, comm);
         MPI_Barrier(comm);
-        for(long r = 0; r < p; r++)v  
+        for(long r = 0; r < p; r++)
             if(r != s)
             {
                 float temp;
-                MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
+                MPI_Recv(&temp, 1, MPI_FLOAT, r, s, comm, &status[r]);
                 norm += temp;
             }
         norm = sqrt(norm);
