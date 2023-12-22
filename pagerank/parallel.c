@@ -137,13 +137,15 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
     if(output)
-        printf("%i. Sent across sizes. Own size is %ld\n Other size is %ld\n", s, sizes[s], outgoingDiagonal[s]);
+        printf("%i. Sent across sizes. \nOwn size is %ld\n Other size is %ld\n", s, sizes[s], outgoingDiagonal[s]);
     long maxsize = 0;
     for(int r = 0; r < p; r++)
         if(maxsize < sizes[r])
             maxsize = sizes[r];
     long incoming[p*maxsize];
     printf("%ld", outOffsets[s]);
+    for(long i = 0; i < numElements; i++)
+        printf("Element %ld\n", outgoingLinks[i];)
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(outgoingLinks + outOffsets[r], outgoingDiagonal[r], MPI_INT, r, r, comm, &requests[r]);
