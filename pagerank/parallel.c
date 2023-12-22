@@ -152,6 +152,8 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         MPI_Irecv(incoming + r * maxsize, sizes[r] , MPI_LONG, r, s, comm, &requests[p+r]);
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
+    if(output)
+        printf("%i. Sent across diagonal\n", s);
     long numOutlinks[numrows];
     for(long i = 0; i < numrows; i++)
         numOutlinks[i] = 0;
