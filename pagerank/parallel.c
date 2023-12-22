@@ -105,13 +105,13 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         if(baseRows[i][10] != -1)
             printf("%i. middle invalid value %ld at %ld\n", s, baseRows[i][10], i);
     }
-    long temp[p*N];
+    int temp[p*N];
     
     MPI_Request requests[2*p];
     for(long r = 0; r < p; r++)
     {
-        MPI_Isend(localDiagonal, N, MPI_LONG, r, r, comm, &requests[r]);
-        MPI_Irecv(temp + r*N, N, MPI_LONG, r, s, comm, &requests[p+r]);
+        MPI_Isend(localDiagonal, N, MPI_INT, r, r, comm, &requests[r]);
+        MPI_Irecv(temp + r*N, N, MPI_INT, r, s, comm, &requests[p+r]);
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
     
