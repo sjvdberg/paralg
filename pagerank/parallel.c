@@ -154,7 +154,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             {
                 rows[k] = baseRows[i][l];
                 if(rows[k] > N)
-                    print("%i. Invalid row value %ld at %ld\n", s, rows[k], k);
+                    printf("%i. Invalid row value %ld at %ld\n", s, rows[k], k);
                 k++;
             }
         }
