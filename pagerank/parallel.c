@@ -181,17 +181,17 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     int tot = rand() % 1000;
     long loctot = 1;
     
-    for(long i = 0; i < numElements; i++)
-        if(rows[i] > N)
-            printf("%i. OLD Rows[%ld] value is %ld\n", s, i, rows[i]);
     for(long i = 0; i < numrows; i++)
     {
         int k = rand() % 1000;
         u[i] = k * (float)tot;
         loctot += k;
     }
+    for(long i = 0; i < numElements; i++)
+        if(rows[i] > N)
+            printf("%i. OLD Rows[%ld] value is %ld\n", s, i, rows[i]);
+    
     MPI_Barrier(comm);
-    MPI_Request req[2*p];
     MPI_Status status[p];
     for(long r = 0; r < p; r++)
     {
