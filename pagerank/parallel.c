@@ -224,7 +224,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
-        MPI_Irecv(tempu + p * numRows(N,p,0), numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
+        MPI_Irecv(tempu + r * numRows(N,p,0), numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
     for(int r = 0; r < p; r++)
