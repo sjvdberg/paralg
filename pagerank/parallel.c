@@ -289,7 +289,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
         MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
     }
-    /*
+    
     MPI_Barrier(comm);
     for(long r = 0; r < p; r++)
         if(r != s)
@@ -298,7 +298,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
             norm += temp;
         }
-    */
+    
     norm = sqrt(norm);
     if(output)
         printf("%i. Norm is %f\n", s, norm);
