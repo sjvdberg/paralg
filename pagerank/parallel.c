@@ -125,7 +125,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             if(baseRows[i][l] != -1)
             {
                 outgoingLinks[tempOffsets[pLoc(N, p, baseRows[i][l])]] = j;
-                tempOffsets[pLoc(N, p, j)]++;
+                tempOffsets[pLoc(N, p, baseRows[i][l])]++;
             }
     
     long sizes[p];
