@@ -121,7 +121,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         numOutlinks[i] = 0;
         
         for(int r = 0; r < p; r++)
-            numOutlinks[i] += temp[N*p+i];
+            numOutlinks[i] += temp[N*r+i];
             
     }
     if(output)
