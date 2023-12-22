@@ -140,7 +140,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
     if(output)
-        printf("%i. Sent across sizes\n", s);
+        printf("%i. Sent across sizes. Own size is %ld\n", s, sizes[s]);
     long maxsize = 0;
     for(int r = 0; r < p; r++)
         if(maxsize < sizes[r])
