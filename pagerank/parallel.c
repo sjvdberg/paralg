@@ -185,7 +185,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             printf("%i. OLD Rows[%ld] value is %ld\n", s, i, rows[i]);
     for(long i = 0; i < numrows; i++)
     {
-        long k = rand() % (N*1000);
+        int k = rand() % 1000;
         u[i] = k;
         tot += k;
     }
