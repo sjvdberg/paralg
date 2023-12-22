@@ -195,10 +195,10 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long r = 0; r < p; r++)
     {
         if(r != s)
-            MPI_Isend(&tot, 1, MPI_INT, r, r, comm, &req[r]);
+            MPI_Send(&tot, 1, MPI_INT, r, r, comm, &req[r]);
     }
     MPI_Barrier(comm);
-    MPI_Wait();
+    MPI_Wait(req);
     for(long r = 0; r < p; r++)
     {
         if(r != s)
