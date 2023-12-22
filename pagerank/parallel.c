@@ -108,14 +108,13 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     long temp[p*N];
     
     MPI_Request requests[2*p];
-    /*
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(localDiagonal, N, MPI_LONG, r, r, comm, &requests[r]);
         MPI_Irecv(temp + r*N, N, MPI_LONG, r, s, comm, &requests[p+r]);
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
-    */
+    
     long numOutlinks[N];
     for(int i = 0; i < N; i++)
     {
