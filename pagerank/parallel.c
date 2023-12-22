@@ -53,6 +53,16 @@ long firstRow(long N, int p, int s)
     return firstrow;
 }
 
+int pLoc(int N, int p, int j)
+{
+    int remainder = N % p;
+    int numrows = N / p;
+    if(j < remainder * (numrows + 1))
+        return j / (numrows + 1);
+    else
+        return j / numrows - remainder;
+}
+
 //n is number of rows/columns.
 //p is number of processors.
 //s is own rank.
@@ -63,8 +73,10 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     srand(time(0) + s);
     long numrows = (N+p-s-1)/p ;
     long firstrow = firstRow(N, p, s);
+    long lastrow = firstrow + numrows - 1;
     long baseRows[numrows][11];
     long numElements = 0;
+    MPI_Request requests[2*p];
     for(long i = 0; i < numrows; i++)
     {
         long k = rand() % 10;
@@ -92,22 +104,74 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     }
     if(output)
         printf("%i. Generated inlinks\n", s);
-    int localDiagonal[N];
+    long outgoingDiagonal[p];
+    long numElements = 0;
+    for(long i = 0; i < numrows; i++)
+        localDiagonal[i] = 0;
+    for(int r = 0; r < p; r++)
+        outgoingDiagonal[r] = 0;
+    for(long i = 0; i < numrows; i++)
+        for(int l = 0; l < 10; l++)
+            if(baseRows[i][l] != -1)
+                outgoingDiagonal[pLoc(N, p, baseRows[i][l])]++;
+    if(output)
+        printf("%i. Generated local and outgoing diagonals.\n", s);
+    
+    long outgoingLinks[numElements];
+    long outOffsets[p];
+    long tempOffsets[p];
+    outOffsets[0] = tempOffsets[0] = 0;
+    for(int r = 0; r < p - 1; r++)
+        outOffsets[r+1] = tempOffsets[r+1] = outOffsets[r] + outgoingDiagonal[r];
+    for(long i = 0; i < numrows; i++)
+        for(int l = 0; l < 10; l++)
+            if(baseRows[i][l] != -1)
+            {
+                int j = baseRows[i][l];
+                if(j < firstrow || j > lastrow)
+                {
+                    outgoingLinks[tempOffsets[pLoc(N, p, j)]] = j;
+                    tempOffsets[pLoc(N, p, j)]++;
+                }
+            }
+    long sizes[p];
+    for(long r = 0; r < p; r++)
+    {
+        MPI_Isend(outgoingDiagonal + r, 1, MPI_LONG, r, r, comm, &requests[r]);
+        MPI_Irecv(sizes + r, 1, MPI_LONG, r, s, comm, &requests[p+r]);
+    }
+    MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
+    long maxsize = 0;
+    for(int r = 0; r < p; r++)
+        if(maxsize < sizes[r])
+            maxsize = sizes[r];
+    long incoming[p*maxsize];
+    for(long r = 0; r < p; r++)
+    {
+        MPI_Isend(outgoingLinks + outOffsets[r], outgoingDiagonal[r], MPI_INT, r, r, comm, &requests[r]);
+        MPI_Irecv(incoming + r * maxsize , MPI_LONG, r, s, comm, &requests[p+r]);
+    }
+    MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
+    long numOutlinks[numrows];
+    for(long i = 0; i < numrows; i++)
+        numOutlinks[i] = 0;
+    for(long r = 0; r < p; r++)
+        for(long i = 0; i < sizes[r]; i++)
+            numOutlinks[incoming[i + maxsize * r]]++;
+    /*
     for(long i = 0; i < N; i++)
         localDiagonal[i] = 0;
     for(long i = 0; i < numrows; i++)
     {
         for(long l = 0; l < 11; l++)
             if(baseRows[i][l] != -1)
-            {
                 localDiagonal[baseRows[i][l]]++;
-            }
         if(baseRows[i][10] != -1)
             printf("%i. middle invalid value %ld at %ld\n", s, baseRows[i][10], i);
     }
     int temp[p*N];
     
-    MPI_Request requests[2*p];
+    
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(localDiagonal, N, MPI_INT, r, r, comm, &requests[r]);
@@ -122,8 +186,8 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         
         for(int r = 0; r < p; r++)
             numOutlinks[i] += temp[N*r+i];
-            
     }
+    */
     if(output)
         printf("%i. Generated outlinks.\n", s);
     
@@ -132,12 +196,12 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     {
         if(baseRows[i][10] != -1)
             printf("%i. invalid value %ld at %ld\n", s, baseRows[i][10], i);
-        if(numOutlinks[i + firstrow] == 0)
+        if(numOutlinks[i] == 0)
         {
             selfLinks++;
             numElements++;
             baseRows[i][10] = i + firstrow;
-            numOutlinks[i + firstrow] = 1;
+            numOutlinks[i] = 1;
         }
     }
     if(output)
@@ -164,8 +228,8 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             if(k != numElements)
                 printf("%i. k should be %ld, but is %ld\n Selflinks = %ld\n", s, numElements, k, selfLinks);
     }
-    float Diagonal[N];
-    for(long i = 0; i < N; i++)
+    float Diagonal[numrows];
+    for(long i = 0; i < numrows; i++)
     {
         if(numOutlinks[i] == 0)
             numOutlinks[i] = 1;
@@ -219,7 +283,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     for(long i = 0; i < numrows; i++)
     {
         res[i] = 0;
-        newres[i] = u[i] * Diagonal[i + firstrow];
+        newres[i] = u[i] * Diagonal[i];
     }
     float tempu[p * numRows(N,p,0)];
     for(long r = 0; r < p; r++)
@@ -285,7 +349,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         //Computed u.
         for(long i = 0; i  < numrows; i++)
         {
-            res[i] = res[i] * Diagonal[i+firstrow];
+            res[i] = res[i] * Diagonal[i];
             newres[i] = 0;
         }
 
