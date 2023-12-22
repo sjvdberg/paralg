@@ -221,21 +221,18 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         res[i] = 0;
         tempr[i + firstrow] = u[i] * Diagonal[i + firstrow];
     }
-    for(long r = 0; r < p; r++)
-        if(r != s) 
-            MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
-    MPI_Barrier(comm);
+    float tempu[p * numRows(N,p,0)];
     for(long r = 0; r < p; r++)
     {
-        if(r != s) 
-        {
-            float tempu[numRows(N, p, r)];
-            MPI_Irecv(tempu, numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
-            for(long i = 0; i < numRows(N, p, r); i++)
-                tempr[i + firstRow(N, p, r)] = tempu[i] * Diagonal[i + firstRow(N, p, r)];
-        }
+        MPI_Isend(u, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+        MPI_Irecv(tempu + p * numRows(N,p,0), numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p+r]);
     }
-    
+    MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
+    for(int r = 0; r < p; r++)
+    {
+        for(long i = 0; i < numRows(N, p, r); i++)
+            tempr[i + firstRow(N, p, r)] = tempu[i + r * numRows(N, p, 0)] * Diagonal[i + firstRow(N, p, r)];   
+    }
     if(output)
         printf("%i Computed tempr\n", s);
     for(long i = 0; i < numrows; i++)
@@ -265,21 +262,16 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     float norm = 0;
     for(long i = 0; i < numrows; i++)
         norm += res[i]*res[i];
-    
+    float locnorms[p];
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
-        MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
+        MPI_Irecv(&locnorms[r], 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
     }
-    
-    MPI_Barrier(comm);
-    for(long r = 0; r < p; r++)
-        if(r != s)
-        {
-            float temp;
-            MPI_Irecv(&temp, 1, MPI_FLOAT, r, s, comm, &requests[p+r]);
-            norm += temp;
-        }
+    MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
+    norm = 0;
+    for(int r = 0; r < p; r++)
+        norm += locnorms[r]
     
     norm = sqrt(norm);
     if(output)
@@ -298,20 +290,19 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             tempr[i + firstrow] = res[i] * Diagonal[i+firstrow];
             newres[i] = 0;
         }
+
         for(long r = 0; r < p; r++)
-            if(r != s) 
-                MPI_Send(res, numrows, MPI_FLOAT, r, r, comm);
-        MPI_Barrier(comm);
+        {
+            MPI_Send(res, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
+            MPI_Recv(tempu + r * numRows(N, p, 0) , numRows(N, p, r), MPI_FLOAT, r, s, comm, &requests[p + r]);
+        }
+        MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
         
-        for(long r = 0; r < p; r++)
-            if(r != s) 
-            {
-                float temp[numRows(N,p,r)];
-                MPI_Recv(temp, numRows(N, p, r), MPI_FLOAT, r, s, comm, &status[r]);
-                for(long i = 0; i < numRows(N,p,r); i++)
-                    tempr[i + firstRow(N, p, r)] = temp[i] * Diagonal[i + firstRow(N, p, r)];
-            }
-        MPI_Barrier(comm);
+        for(int r = 0; r < p; r++)
+        {
+            for(long i = 0; i < numRows(N,p,r); i++)
+                    tempr[i + firstRow(N, p, r)] = tempu[i + r * numRows(N,p,r)] * Diagonal[i + firstRow(N, p, r)];
+        }
         //Computed tempr.
         for(long i = 0; i < numrows; i++)
         {
@@ -329,16 +320,12 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         for(long i = 0; i < numrows; i++)
             norm += res[i]*res[i];
         for(long r = 0; r < p; r++)
-            if(r != s)
-                MPI_Send(&norm, 1, MPI_FLOAT, r, r, comm);
-        MPI_Barrier(comm);
+            MPI_Isend(&norm, 1, MPI_FLOAT, r, r, comm, &requests[r]);
+            MPI_Irecv(&locnorms + r, 1, MPI_FLOAT, r, s, comm, &requests[p + r]);
+        MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
+        norm = 0;
         for(long r = 0; r < p; r++)
-            if(r != s)
-            {
-                float temp;
-                MPI_Recv(&temp, 1, MPI_FLOAT, r, s, comm, &status[r]);
-                norm += temp;
-            }
+            norm += locnorms[r]
         norm = sqrt(norm);
         norms[t] = norm;
         if(output)
