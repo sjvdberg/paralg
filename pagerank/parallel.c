@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static bool output = true;
+static bool output = false;
 
 long main(int argc, char **argv)
 {
@@ -135,17 +135,12 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         MPI_Isend(outgoingDiagonal + r, 1, MPI_LONG, r, r, comm, &requests[r]);
         MPI_Irecv(sizes + r, 1, MPI_LONG, r, s, comm, &requests[p+r]);
     }
-    MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
-    if(output)
-        printf("%i. Sent across sizes. \nOwn size is %ld\n Other size is %ld\n", s, sizes[s], outgoingDiagonal[s]);
-    long maxsize = 0;
+    MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);long maxsize = 0;
     for(int r = 0; r < p; r++)
         if(maxsize < sizes[r])
             maxsize = sizes[r];
     long incoming[p*maxsize];
     printf("%ld", outOffsets[s]);
-    for(long i = 0; i < numElements; i++)
-        printf("Element %ld\n", outgoingLinks[i]);
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(outgoingLinks + outOffsets[r], outgoingDiagonal[r], MPI_LONG, r, r, comm, &requests[r]);
