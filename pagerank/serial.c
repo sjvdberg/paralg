@@ -9,7 +9,7 @@ void main()
 {
     int N = 10000000;
     for(int i = 10; i < N; i *= 10)
-        Serial(N);
+        Serial(i);
 }
 
 void Serial(long N)
