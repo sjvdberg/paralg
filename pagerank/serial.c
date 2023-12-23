@@ -56,9 +56,7 @@ void Serial(long N)
             numOutlinks[i] = 1;
         }
         else
-        {
             numElements += numOutlinks[i];
-        }
     }
     if(output)
         printf("Added additional outlinks.\n");
@@ -122,7 +120,7 @@ void Serial(long N)
         for(int j = offsets[i]; j < nextOffset; j++)
             r[i] += tempr[rows[j]];
         r[i] = r[i] * p;
-        r[i] = 1 - (u[i] - r[i]);
+        r[i] = 1 + r[i] - u[i];
     }
     if(output)
         printf("Computed initial r.\n");
