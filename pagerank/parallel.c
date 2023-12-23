@@ -210,37 +210,19 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     if(output)
         printf("Computed stochastic row Matrix.\n");
     float u[numrows], res[numrows], tempr[N];
-    int tot = rand() % 1000;
-    long loctot = 1;
+    long loctot = 0;
+    long globtot;
     
     for(long i = 0; i < numrows; i++)
     {
         int k = rand() % 1000;
-        u[i] = k * (float)tot;
+        u[i] = k;
         loctot += k;
     }
-    for(long i = 0; i < numElements; i++)
-        if(rows[i] > N)
-            printf("%i. OLD Rows[%ld] value is %ld\n", s, i, rows[i]);
-    
-    MPI_Barrier(comm);
-    
-    int tmp[p];
-    for(long r = 0; r < p; r++)
-    {
-        MPI_Isend(&tot, 1, MPI_INT, r, r, comm, &requests[r]);
-        MPI_Irecv(&tmp, 1, MPI_INT, r, s, comm, &requests[p+r]);
-    }
-    MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
-    tot = 0;
-    for(int r = 0; r < p; r++)
-        tot += tmp[r];
-    for(long i = 0; i < numElements; i++)
-        if(rows[i] > N)
-            printf("%i. Rows[%ld] value is %ld\n", s, i, rows[i]);
+    MPI_Allreduce(&loctot, &globtot, 1, MPI_LONG, MPI_SUM, comm);
     
     for(long i = 0; i < numrows; i++)
-        u[i] = u[i] / (float)tot /(float)loctot;
+        u[i] = u[i] / (float)globtot;
     if(output)
         printf("%i Computed own u\n", s);
     long t = 0;
