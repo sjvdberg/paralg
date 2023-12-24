@@ -21,6 +21,7 @@ long main(int argc, char **argv)
 
     if(n<0) MPI_Abort(MPI_COMM_WORLD,-1);
 
+    //Start iterating at $N = 10. Repeatedly keep increasing N by a factor 10 until the maximum is reached.
     for(long i = 10; i <= n; i *= 10)
     {
         MPI_Barrier(MPI_COMM_WORLD);
@@ -35,11 +36,12 @@ long main(int argc, char **argv)
     return 0;
 } /* end main */
 
-
+//Gives the number of rows on processor s with a total of N rows and p processors. 
 long numRows(long N, int p, int s)
 {
     return (N + p - s - 1)/p;
 }
+//Gives the global index of the first row of processor s when there are a total of N rows and p processors.
 long firstRow(long N, int p, int s)
 {
     long numrows = numRows(N, p,s);
@@ -49,11 +51,12 @@ long firstRow(long N, int p, int s)
         //numrows is the same as all earlier processors.
         firstrow = s * numrows;
     else
-        //The first remainder processors have 1 more element
+        //The first remainder processors have 1 more element.
         firstrow = s * numrows + remainder;
     return firstrow;
 }
 
+//Gives the processor number that stores the row with global index j when there are N rows and p processors. 
 int pLoc(int N, int p, int j)
 {
     int remainder = N % p;
@@ -62,6 +65,7 @@ int pLoc(int N, int p, int j)
         return j / (numrows + 1);
     else
         return  (j - remainder) / numrows;
+        //Equivalent to: remainder + (j - remainder * (numrows + 1)/numrows
 }
 
 //n is number of rows/columns.
@@ -69,29 +73,33 @@ int pLoc(int N, int p, int j)
 //s is own rank.
 void computeVector(long N, int p, int s, MPI_Comm comm)
 {
+    //Clocks for measuring the time
     clock_t start, startloop, end;
     start = clock();
+    //Set random seed
     srand(time(0) + s);
     long numrows = (N+p-s-1)/p ;
     long firstrow = firstRow(N, p, s);
+    //Block partition, so last row is determined from firstrow and numrows.
     long lastrow = firstrow + numrows - 1;
     long baseRows[numrows][11];
     long numElements = 0;
+    float prob = 0.85;
     MPI_Request requests[2*p];
+    //Creates baseRows. Here positions with -1 will be removed later in the formation of rows.
     for(long i = 0; i < numrows; i++)
     {
         long k = rand() % 10;
         numElements += k + 1;
-        for(long l = 0; l < 10; l++)
+        for(long l = 0; l < 11; l++)
         {
             if(l <= k)
                 baseRows[i][l] = rand() % N;
-            else
+            else 
                 baseRows[i][l] = -1;
         }
-        baseRows[i][10] = -1;
     }
-
+    //Keep track of how many elements will be sent to each other processor.
     long outgoingDiagonal[p];
     for(int r = 0; r < p; r++)
         outgoingDiagonal[r] = 0;
@@ -100,6 +108,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             if(baseRows[i][l] != -1)
                 outgoingDiagonal[pLoc(N, p, baseRows[i][l])]++;
 
+    //Keep track which elements will be sent to each other processor. Store this in CRS format.
     long outgoingLinks[numElements];
     long outOffsets[p];
     long tempOffsets[p];
@@ -110,11 +119,12 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         for(int l = 0; l < 10; l++)
             if(baseRows[i][l] != -1)
             {
-                long j = baseRows[i][l];
-                outgoingLinks[tempOffsets[pLoc(N, p, j)]] = j;
-                tempOffsets[pLoc(N, p, j)]++;
+                int r = pLoc(N, p, baseRows[i][l]);
+                outgoingLinks[tempOffsets[r]] = baseRows[i][l];
+                tempOffsets[r]++;
             }
     
+    //Send a message indicating the number of elements that each processor will receive. Store the result in sizes.
     long sizes[p];
     for(long r = 0; r < p; r++)
     {
@@ -122,10 +132,12 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         MPI_Irecv(sizes + r, 1, MPI_LONG, r, s, comm, &requests[p+r]);
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);long maxsize = 0;
+    //Find the largest number of elements we will be receiving.
     for(int r = 0; r < p; r++)
         if(maxsize < sizes[r])
             maxsize = sizes[r];
     long incoming[p*maxsize];
+    //Get elements from the other processors. Some spots in incoming may stay empty.
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(outgoingLinks + outOffsets[r], outgoingDiagonal[r], MPI_LONG, r, r, comm, &requests[r]);
@@ -133,6 +145,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     }
     MPI_Waitall(2*p, requests,MPI_STATUSES_IGNORE);
 
+    //Compute diagonal.
     long numOutlinks[numrows];
     for(long i = 0; i < numrows; i++)
         numOutlinks[i] = 0;
@@ -141,9 +154,9 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             numOutlinks[incoming[i + maxsize * r] - firstrow]++;
 
     
+    //Add self-links in baseRows and the diagonal.
     long selfLinks = 0;
     for(long i = 0; i < numrows; i++)
-    {
         if(numOutlinks[i] == 0)
         {
             selfLinks++;
@@ -151,7 +164,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             baseRows[i][10] = i + firstrow;
             numOutlinks[i] = 1;
         }
-    }
+    //Prune baseRows and store result in CRS format.
     long rows[numElements];
     long offsets[numrows];
     offsets[0] = 0;
@@ -167,6 +180,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         if(i + 1 != numrows)
             offsets[i+1] = k;
     }
+    //Determine inverse diagonal.
     float Diagonal[numrows];
     for(long i = 0; i < numrows; i++)
         Diagonal[i] = 1 / (float)numOutlinks[i];
@@ -176,6 +190,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
     long loctot = 0;
     long globtot;
     
+    //Give each u[i] a random value.
     for(long i = 0; i < numrows; i++)
     {
         int k = rand() % 1000;
@@ -183,23 +198,20 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         loctot += k;
     }
     MPI_Allreduce(&loctot, &globtot, 1, MPI_LONG, MPI_SUM, comm);
-    
+    //Normalize u[i]
     for(long i = 0; i < numrows; i++)
         u[i] = u[i] / (float)globtot;
 
-    long t = 0;
-    float norms[1000];
-    for(long i = 0; i < 1000; i++)
-        norms[i] = -1;
-    float prob = 0.85;
+    
+    //Determine initial residual.
     float newres[numrows];
-
     for(long i = 0; i < numrows; i++)
     {
         res[i] = 0;
         newres[i] = u[i] * Diagonal[i];
     }
     float tempu[p * numRows(N,p,0)];
+    //Send newres to each other processor.
     for(long r = 0; r < p; r++)
     {
         MPI_Isend(newres, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
@@ -210,7 +222,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         for(long i = 0; i < numRows(N, p, r); i++)
             tempr[i + firstRow(N, p, r)] = tempu[i + r * numRows(N, p, 0)]; 
 
-
+    //Compute initial residual.
     for(long i = 0; i < numrows; i++)
     {
         long nextOffset;
@@ -225,30 +237,33 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         res[i] = 1 + res[i] - u[i];
     }
     
+    //Compute initial norm.
     float locnorm = 0;
     float globnorm;
     for(long i = 0; i < numrows; i++)
         locnorm += res[i]*res[i];
-    float locnorms[p];
+
     MPI_Allreduce(&locnorm, &globnorm, 1, MPI_FLOAT, MPI_SUM, comm);
 
     
     float norm = sqrt(globnorm);
+    long t = 0;
 
+    //Start loop
     startloop = clock();
     while(norm > 0.000001)
     {
+        //compute new u
         for(long i = 0; i < numrows; i++)
             u[i] += res[i];
 
-        //Computed u.
+        //Computed new r * D^-1.
         for(long i = 0; i  < numrows; i++)
         {
             res[i] = res[i] * Diagonal[i];
             newres[i] = 0;
         }
-
-        
+        //Communicate r * D^-1 to all processors 
         for(long r = 0; r < p; r++)
         {
             MPI_Isend(res, numrows, MPI_FLOAT, r, r, comm, &requests[r]);
@@ -261,7 +276,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
             for(long i = 0; i < numRows(N,p,r); i++)
                 tempr[i + firstRow(N, p, r)] = tempu[i + r * numRows(N, p, 0)];
         }
-        //Computed tempr.
+        //Compute next r.
         for(long i = 0; i < numrows; i++)
         {
             long nextOffset;
@@ -273,7 +288,7 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
                 newres[i] += (float)tempr[rows[j]];
             res[i] = newres[i] * prob;
         }
-        //Computed r.
+        //Compute new norm.
         norm = 0;
         locnorm = 0;
         for(long i = 0; i < numrows; i++)
@@ -281,15 +296,15 @@ void computeVector(long N, int p, int s, MPI_Comm comm)
         MPI_Allreduce(&locnorm, &globnorm, 1, MPI_FLOAT, MPI_SUM, comm);
 
         norm = sqrt(globnorm);
-        norms[t] = norm;
         t++;
+        //backup loop break to ensure the program terminates.
         if(t > 1000)
         {
             printf("%i. Loop break at t = %i. Norm is %f\n", s, t, norm);
             break;
         }
     }
-    
+    //Final time measurements
     end = clock();
     if(s == 0)
     {
