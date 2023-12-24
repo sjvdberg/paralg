@@ -156,7 +156,6 @@ void Serial(long N)
     for(int i = 0; i < t - 2; i++)
         totNormChanges += (norms[i+1]/norms[i]);
     totNormChanges = totNormChanges / t;
-    }
     printf("average norm change is %f\n", totNormChanges);
 
     //Do time measurements.
