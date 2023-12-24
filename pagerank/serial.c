@@ -115,7 +115,7 @@ void Serial(long N)
     norm = sqrt(norm);
 
     //Create table to keep track of norms in each iteration.
-    int norms[1000];
+    float norms[1000];
     for(int i = 0; i < 1000; i++)
         norms[i] = -1;
     norms[0] = norm;
@@ -153,9 +153,10 @@ void Serial(long N)
     }
     //compute average norm changes
     float totNormChanges = 0;
-    for(int i = 0; i < t -1; i++)
+    for(int i = 0; i < t - 2; i++)
         totNormChanges += (norms[i+1]/norms[i]);
     totNormChanges = totNormChanges / t;
+    }
     printf("average norm change is %f\n", totNormChanges);
 
     //Do time measurements.
