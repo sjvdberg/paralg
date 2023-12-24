@@ -148,8 +148,6 @@ void Serial(long N)
         for(int i = 0; i< N; i++)
             norm += r[i]*r[i];
         norm = sqrt(norm);
-        if(output)
-            printf("Computed u and r in step %i, current norm is %f\n", t, norm);
         t++;
         norms[t] = norm;
     }
